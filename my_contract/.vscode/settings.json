@@ -1,0 +1,10 @@
+{
+  "python.analysis.typeCheckingMode": "off",
+  "python.formatting.provider": "yapf",
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": [
+    "--max-line-length=120",
+    "--ignore=E402,F841,F401,E302,E305, E251",
+  ],
+  "python.linting.pylintEnabled": false
+}
