@@ -1,72 +1,64 @@
 import React, { Component } from 'react'
-import { Button, message } from 'antd'
-import { Card, Form, Input, Checkbox } from 'antd'
+import { Card, Form, Input, Checkbox, Button } from 'antd'
+// 导入logo.png
 import logo from '@/assets/logo.png'
+// 导入样式文件
 import './index.scss'
-import { useStore } from '@/store'
-import { useNavigate } from 'react-router-dom'
-
-const { loginStore } = useStore()
-const navigate = useNavigate()
-
-async function onFinish (values) {
-  console.log(values)
-  // values：放置的是所有表单项中用户输入的内容
-  // todo: 登陆
-  await loginStore.getToken({
-    mobile: values.username,
-    code: values.password
-  })
-  // 跳转至首页
-  navigate('/', { replace: true })
-  // 提示用户
-  message.success("登陆成功")
-}
 
 export default class Login extends Component {
+  onFinish = (values) => {
+    console.log(values)
+    // values： 放置的是所有表单项中用户输入的内容
+  }
+
+  onFinishFailed = (values) => {
+    console.log(values)
+
+  }
+
   render () {
     return (
       <div className='login'>
-        <Card className="login-container">
-          <img className="login-logo" src={logo} alt="" />
-          {/* 登陆表单 */}
+        <Card className='login-container'>
+          <img className='login-logo' src={logo} alt="" />
+          {/* 登录表单 */}
+          {/* 子项用到的触发事件 需要在Form中都声明一下 */}
           <Form
-            onFinish={onFinish}
-            // onFinishFailed={onFinishFailed}
             validateTrigger={['onBlur', 'onChange']}
             initialValues={{
-              username: 13811111111,
               remember: true,
-              password: '246810'
             }}
+            onFinish={this.onFinish}
+            onFinishFailed={this.onFinishFailed}
           >
             <Form.Item
               name="username"
               rules={[
                 {
                   required: true,
-                  message: '请输入手机号!',
+                  message: 'Please input your username!',
                 },
                 {
-                  pattern: /^1[3-9]\d{9}$/,
-                  message: '请输入正确的手机号',
                   validateTrigger: 'onBlur'
-                },
+                }
               ]}
             >
-              <Input size="large" placeholder="请输入手机号" />
+              <Input size="large" placeholder="请输入域帐号" />
             </Form.Item>
             <Form.Item
               name="password"
               rules={[
                 {
                   required: true,
-                  message: '请输入密码!',
+                  message: 'Please input your password!',
                 },
-                { len: 6, message: '密码需6个字符', validateTrigger: 'onBlur' },
+                {
+                  min: 6,
+                  message: '密码长度不能低于６位'
+                }
               ]}
             >
-              <Input size="large" placeholder="请输入验证码" />
+              <Input size="large" placeholder="请输入密码" />
             </Form.Item>
             <Form.Item
               name="remember"
