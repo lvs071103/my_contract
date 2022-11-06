@@ -76,7 +76,7 @@ function Login () {
               }
             ]}
           >
-            <Input size="large" placeholder="请输入密码" />
+            <Input size="large" type='password' placeholder="请输入密码" />
           </Form.Item>
           <Form.Item
             name="remember"

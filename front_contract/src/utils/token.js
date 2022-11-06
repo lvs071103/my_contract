@@ -1,6 +1,6 @@
 // 封装localStorage存取token
 
-const key = 'pc-key'
+const key = 'my-contract'
 
 const setToken = (token) => {
   return window.localStorage.setItem(key, token)
