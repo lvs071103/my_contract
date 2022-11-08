@@ -1,25 +1,34 @@
 import React, { Component } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { unstable_HistoryRouter as HistoryRouter, Route, Routes } from 'react-router-dom'
 import Login from '@/pages/Login'
-import Layout from '@/pages/Layout'
+import GeekLayout from '@/pages/Layout'
 import AuthRoute from './components/AuthRoute'
 import './index.scss'
+import Home from './pages/Layout/Home'
+import User from './pages/Layout/User'
+import Contract from './pages/Layout/Contract'
+import { history } from '@/utils/history'
 
 export default class App extends Component {
   render () {
     return (
-      <BrowserRouter>
+      // 路由配置
+      <HistoryRouter history={history}>
         <Routes>
           {/* 创建路由path和组件对应关系 */}
           {/* Layout需要鉴权处理 */}
           <Route path='/' element={
             <AuthRoute>
-              <Layout />
+              <GeekLayout />
             </AuthRoute>
-          }></Route>
-          <Route path='/login' element={<Login />}></Route>
+          }>
+            <Route index element={<Home />}></Route>
+            <Route path='/user' element={<User />}></Route>
+            <Route path='/contract' element={<Contract />}></Route>
+          </Route>
+          <Route path='/login/' element={<Login />}></Route>
         </Routes>
-      </BrowserRouter>
+      </HistoryRouter>
     )
   }
 }

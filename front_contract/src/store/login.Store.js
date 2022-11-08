@@ -36,8 +36,10 @@ class LoginStore {
     setToken(this.token)
   }
 
+  // 退出
   loginOut = () => {
     this.token = ''
+    // 移除token
     removeToken()
   }
 }

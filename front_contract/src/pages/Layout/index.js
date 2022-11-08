@@ -16,7 +16,7 @@ const { Header, Sider } = Layout
 const GeekLayout = () => {
   const { pathname } = useLocation()
   const { userStore, loginStore, channelStore } = useStore()
-  // 获取用衣数据民
+  // 获取用户数据
   useEffect(() => {
     try {
       userStore.getUserInfo()
@@ -26,15 +26,15 @@ const GeekLayout = () => {
 
   const items = [
     { label: <Link to={'/'}>数据概览</Link>, key: '/', icon: <HomeOutlined /> },
-    { label: <Link to={'/article'}>用户管理</Link>, key: '/article', icon: <DiffOutlined /> },
-    { label: <Link to={'/publish'}>合同管理</Link>, key: '/publish', icon: <EditOutlined /> }
+    { label: <Link to={'/user'}>用户管理</Link>, key: '/user', icon: <DiffOutlined /> },
+    { label: <Link to={'/contract'}>合同管理</Link>, key: '/contract', icon: <EditOutlined /> }
   ]
   // 确定退出
   const navigate = useNavigate()
   const onLogout = () => {
     // 退出登陆 删除token 跳回到登录
     loginStore.loginOut()
-    navigate('/login')
+    navigate('/login/')
   }
 
   return (
@@ -42,7 +42,7 @@ const GeekLayout = () => {
       <Header className="header">
         <div className="logo" />
         <div className="user-info">
-          <span className="user-name">{userStore.userInfo.name}</span>
+          <span className="user-name">{userStore.userInfo.username}</span>
           <span className="user-logout">
             <Popconfirm
               onConfirm={onLogout}
@@ -60,6 +60,7 @@ const GeekLayout = () => {
             mode="inline"
             theme="dark"
             // defaultSelectedKeys={[pathname]}
+            // 高亮原理： selectedKeys === item key
             selectedKeys={[pathname]}
             style={{ height: '100%', borderRight: 0 }}
             items={items}

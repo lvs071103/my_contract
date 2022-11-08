@@ -25,7 +25,6 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use((response) => {
   // 2xx 范围内的状态码都会触发该函数。
   // 对响应数据做点什么
-  console.log(111111)
   return response
 }, (error) => {
   // 超出 2xx 范围的状态码都会触发该函数。
@@ -33,8 +32,7 @@ http.interceptors.response.use((response) => {
   console.dir(error)
   if (error.response.status === 401) {
     //跳回到登录 reactRouter默认状态下 并不支持在组件之外完成路由跳转
-    console.log('login')
-    history.push('/login')
+    history.push('/login/')
   }
   return Promise.reject(error)
 })
