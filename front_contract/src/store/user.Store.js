@@ -7,7 +7,7 @@ class UserStore {
     makeAutoObservable(this)
   }
   getUserInfo = async () => {
-    // 调用接口获取数据
+    // 调用用户接口获取数据
     const res = await http.get('/user/profile')
     this.userInfo = res.data
   }
