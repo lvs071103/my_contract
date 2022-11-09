@@ -109,7 +109,6 @@ def xls_to_list_handler(xls_file):
 
 
 if __name__ == '__main__':
-    # print(len(sys.argv))
     parser = argparse.ArgumentParser(description="随机输出用户列表")
     parser.add_argument('-i', '--input', required=True, help="指定输入文件")
     parser.add_argument('-o', '--output', required=True, help="指定输出文件")
