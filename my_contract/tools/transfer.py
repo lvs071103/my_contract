@@ -11,7 +11,7 @@ from openpyxl import Workbook, load_workbook
 # 终端打印，输出到文件
 def write_file(filename, users, key):
     if not os.path.exists(filename):
-        print("生成新的随机用户: ")
+        print("生成新的随机用户: ==========>")
         # 创建一个文件对象
         wb = Workbook()
         ws = wb.active
@@ -24,7 +24,7 @@ def write_file(filename, users, key):
     else:
         wb = load_workbook(filename)
         if key in wb.sheetnames:
-            print(key, "将被更新: ")
+            print(key, "将被更新: ========>")
             wb.remove(wb[key])
             wb.create_sheet(key)
             ws = wb[key]
@@ -34,7 +34,7 @@ def write_file(filename, users, key):
                 ws.append([each])
             wb.save(filename)
         else:
-            print("新增: ", key)
+            print("新增: =========>", key)
             wb.create_sheet(key)
             ws = wb[key]
             ws['A1'] = key
@@ -110,12 +110,13 @@ def xls_to_list_handler(xls_file):
 
 if __name__ == '__main__':
     # print(len(sys.argv))
-    parser = argparse.ArgumentParser(description="随机输出邮件列表")
+    parser = argparse.ArgumentParser(description="随机输出用户列表")
     parser.add_argument('-i', '--input', required=True, help="指定输入文件")
     parser.add_argument('-o', '--output', required=True, help="指定输出文件")
-    parser.add_argument('-n', '--num', required=True, help="指定随机数量")
+    parser.add_argument('-n', '--num', help="指定随机数量,默认10", default=10)
     args = parser.parse_args()
-    if len(sys.argv) <= 6:
+    
+    if len(sys.argv) <= 4:
         parser.print_help()
     user_list = xls_to_list_handler(args.input)
     write_list = []
