@@ -7,7 +7,6 @@ import random
 from openpyxl import Workbook, load_workbook
 
 
-
 # 终端打印，输出到文件
 def write_file(filename, users, key):
     if not os.path.exists(filename):
@@ -114,7 +113,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', required=True, help="指定输出文件")
     parser.add_argument('-n', '--num', help="指定随机数量,默认10", default=10)
     args = parser.parse_args()
-    
+
     if len(sys.argv) <= 4:
         parser.print_help()
     user_list = xls_to_list_handler(args.input)
@@ -123,4 +122,4 @@ if __name__ == '__main__':
     for item in user_list:
         for k, v in item.items():
             choiced_users = users_choice(users=v, num=int(args.num))
-            write_file(key=k,users=choiced_users, filename=args.output)
+            write_file(key=k, users=choiced_users, filename=args.output)
