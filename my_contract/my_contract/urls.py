@@ -18,11 +18,13 @@ Including another URLconf
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path('api/user/', include('accounts.urls')),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/group/', include('accounts.urls_group')),
+    path('api/token/', TokenObtainPairView.as_view(),
+         name='token_obtain_pair'),
     path('api/refresh', TokenRefreshView.as_view(), name='token_refresh'),
-    path('', include('hello.urls'))
+    path('', include('hello.urls')),
+    path('api/contract/', include('contract.urls')),
 ]

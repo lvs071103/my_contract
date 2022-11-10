@@ -4,9 +4,9 @@ import Login from '@/pages/Login'
 import GeekLayout from '@/pages/Layout'
 import AuthRoute from './components/AuthRoute'
 import './index.scss'
-import Home from './pages/Layout/Home'
-import User from './pages/Layout/User'
-import Contract from './pages/Layout/Contract'
+import Home from './pages/Home'
+import User from './pages/User'
+import Contract from './pages/Contract'
 import { history } from '@/utils/history'
 
 export default class App extends Component {
@@ -23,8 +23,8 @@ export default class App extends Component {
             </AuthRoute>
           }>
             <Route index element={<Home />}></Route>
-            <Route path='/user' element={<User />}></Route>
-            <Route path='/contract' element={<Contract />}></Route>
+            <Route path='/user/' element={<User />}></Route>
+            <Route path='/contract/' element={<Contract />}></Route>
           </Route>
           <Route path='/login/' element={<Login />}></Route>
         </Routes>
