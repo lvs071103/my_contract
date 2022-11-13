@@ -1,7 +1,7 @@
 import { Layout, Menu, Popconfirm } from 'antd'
 import {
-  HomeOutlined,
-  DiffOutlined,
+  DashboardFilled,
+  TeamOutlined,
   EditOutlined,
   LogoutOutlined
 } from '@ant-design/icons'
@@ -15,19 +15,20 @@ const { Header, Sider } = Layout
 
 const GeekLayout = () => {
   const { pathname } = useLocation()
-  const { userStore, loginStore, channelStore } = useStore()
+  const { userStore, loginStore, channelStore, groupStore } = useStore()
   // 获取用户数据
   useEffect(() => {
     try {
       userStore.getUserInfo()
       channelStore.loadChannelList()
+      groupStore.loadGroupList()
     } catch { }
-  }, [userStore, channelStore])
+  }, [userStore, channelStore, groupStore])
 
   const items = [
-    { label: <Link to={'/'}>数据概览</Link>, key: '/', icon: <HomeOutlined /> },
-    { label: <Link to={'/user'}>用户管理</Link>, key: '/user', icon: <DiffOutlined /> },
-    { label: <Link to={'/contract'}>合同管理</Link>, key: '/contract', icon: <EditOutlined /> }
+    { label: <Link to={'/'}>数据概览</Link>, key: '/', icon: <DashboardFilled /> },
+    { label: <Link to={'/user/'}>用户管理</Link>, key: '/user/', icon: <TeamOutlined /> },
+    { label: <Link to={'/contract/'}>合同管理</Link>, key: '/contract/', icon: <EditOutlined /> }
   ]
   // 确定退出
   const navigate = useNavigate()
@@ -77,3 +78,4 @@ const GeekLayout = () => {
 }
 
 export default observer(GeekLayout)
+// export default GeekLayout

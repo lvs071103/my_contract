@@ -10,7 +10,7 @@ class LoginStore {
   }
 
   getToken = async ({ username, password }) => {
-    console.log(username, password)
+    // console.log(username, password)
     // 调用登陆接口
     // 存入token
     const response = await http.post('http://localhost:8000/api/token/', {
