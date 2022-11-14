@@ -27,9 +27,6 @@ class UserListView(APIView):
         except EmptyPage:
             page_obj = paginator.page(paginator.num_pages)
 
-        print(page_obj)
-        print(page_obj.has_next())
-        print(page_obj.has_previous())
         users_as_json = serializers.serialize('json', page_obj)
         user_list = json.loads(users_as_json)
 
@@ -51,16 +48,28 @@ class GroupListView(APIView):
     @staticmethod
     def get(request):
         query_list = []
-        groups = Group.objects.all()
-        groups_as_json = serializers.serialize('json', groups)
+        groups = Group.objects.get_queryset().order_by('id')
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('pageSize')
+        paginator = Paginator(groups, page_size)
+
+        try:
+            page_obj = paginator.get_page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        groups_as_json = serializers.serialize('json', page_obj)
         group_lit = json.loads(groups_as_json)
+
         for item in group_lit:
             item['fields']['id'] = item['pk']
             query_list.append(item['fields'])
 
         return JsonResponse({
             "data": query_list,
-            "count": len(query_list),
+            "count": len(groups),
             'success': True,
         })
 

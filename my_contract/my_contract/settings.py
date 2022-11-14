@@ -146,7 +146,6 @@ CORS_ALLOWED_ORIGINS = [
 
 AUTH_PROFILE_MODULE = 'accounts.Profile'
 
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
 }

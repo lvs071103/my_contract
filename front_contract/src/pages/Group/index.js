@@ -1,24 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Tag, Input } from 'antd'
-import 'moment/locale/zh-cn'
-// import locale from 'antd/es/date-picker/locale/zh_CN'
-import './index.scss'
-// import { useStore } from '@/store'
+import { Link, useNavigate } from 'react-router-dom'
 import { http } from '@/utils'
-// import img404 from '@/assets/error.png'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 
 
+
 const { Search } = Input
 
-const User = () => {
+const Group = () => {
 
-  // 用户列表管理 统一管理数据 将来修入给setList传对象
-  const [users, setUsers] = useState({
-    list: [], //用户列表
-    count: 0 // 用户数量
+  const [groups, setGroups] = useState({
+    list: [], //组列表
+    count: 0 // 组数量
   })
 
   // 分页参数管理
@@ -27,20 +22,13 @@ const User = () => {
     pageSize: 10
   })
 
-  // 如果异步请求函数需要依赖一些数据的变化而重新执行
-  // 推荐把它写在内部
-  // 统一不抽离函数到外面 只要涉及到异步请求的函数 都放到useEffect内部
-  // 本质区别：写到外面每次组件更新都会重新进行函数初始化 这本身就是一次性能消耗
-  // 而写到useEffect中，只会在依赖项发生变化的时候 函数才会进行重新初始化
-  // 避免性能损失
-
   useEffect(() => {
     const loadList = async () => {
-      const res = await http.get('accounts/user/list', { params })
+      const res = await http.get('accounts/group/list', { params })
       // console.log("response: ", res.data)
       const { data, count } = res.data
       // console.log(count)
-      setUsers({
+      setGroups({
         list: data,
         count: count,
       })
@@ -80,30 +68,8 @@ const User = () => {
       dataIndex: 'id',
     },
     {
-      title: '用户名',
-      dataIndex: 'username',
-    },
-    {
-      title: '加入时间',
-      dataIndex: 'date_joined'
-    },
-    {
-      title: '最近登陆',
-      dataIndex: 'last_login'
-    },
-    {
-      title: '邮箱',
-      dataIndex: 'email'
-    },
-    {
-      title: '管理员',
-      dataIndex: 'is_superuser',
-      render: data => <Tag color="green">是</Tag>
-    },
-    {
-      title: '状态',
-      dataIndex: 'is_active',
-      render: data => <Tag color="green">激活</Tag>
+      title: '用户组名',
+      dataIndex: 'name',
     },
     {
       title: '操作',
@@ -148,7 +114,7 @@ const User = () => {
             <Link to="/">首页</Link>
           </Breadcrumb.Item>
           <Breadcrumb.Item>用户管理</Breadcrumb.Item>
-          <Breadcrumb.Item>用户列表</Breadcrumb.Item>
+          <Breadcrumb.Item>用户组</Breadcrumb.Item>
         </Breadcrumb>
       </Card>
 
@@ -167,11 +133,11 @@ const User = () => {
         <Table
           rowKey="id"
           columns={columns}
-          dataSource={users.list}
+          dataSource={groups.list}
           pagination={
             {
               pageSize: params.pageSize,
-              total: users.count,
+              total: groups.count,
               onChange: pageChange
             }
           }
@@ -182,4 +148,4 @@ const User = () => {
   )
 }
 
-export default observer(User)
+export default observer(Group)

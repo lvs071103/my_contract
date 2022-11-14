@@ -3,18 +3,22 @@ import {
   DashboardFilled,
   TeamOutlined,
   EditOutlined,
-  LogoutOutlined
+  LogoutOutlined,
 } from '@ant-design/icons'
 import './index.scss'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useStore } from '@/store'
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 
 const { Header, Sider } = Layout
 
 const GeekLayout = () => {
+
   const { pathname } = useLocation()
+
+  console.log(pathname)
+
   const { userStore, loginStore, channelStore, groupStore } = useStore()
   // 获取用户数据
   useEffect(() => {
@@ -26,10 +30,24 @@ const GeekLayout = () => {
   }, [userStore, channelStore, groupStore])
 
   const items = [
-    { label: <Link to={'/'}>数据概览</Link>, key: '/', icon: <DashboardFilled /> },
-    { label: <Link to={'/user/'}>用户管理</Link>, key: '/user/', icon: <TeamOutlined /> },
-    { label: <Link to={'/contract/'}>合同管理</Link>, key: '/contract/', icon: <EditOutlined /> }
+    getItem(<Link to={'/'}>数据概览</Link>, '/', <DashboardFilled />),
+    getItem(<Link to={'#'}>用户管理</Link>, 'parent-1', <TeamOutlined />,
+      [
+        getItem(<Link to={'/accounts/group/list'}>用户组</Link>, '/accounts/goup/list'),
+        getItem(<Link to={'/accounts/user/list'}>用户</Link>, '/accounts/user/list'),
+      ]),
+    getItem(<Link to={'/contract'}>合同管理</Link>, '/contract', <EditOutlined />)
   ]
+
+  function getItem (label, key, icon, children) {
+    return {
+      key,
+      icon,
+      children,
+      label,
+    }
+  }
+
   // 确定退出
   const navigate = useNavigate()
   const onLogout = () => {
@@ -60,9 +78,9 @@ const GeekLayout = () => {
           <Menu
             mode="inline"
             theme="dark"
-            // defaultSelectedKeys={[pathname]}
+            defaultSelectedKeys={[pathname]}
             // 高亮原理： selectedKeys === item key
-            selectedKeys={[pathname]}
+            // selectedKeys={[pathname]}
             style={{ height: '100%', borderRight: 0 }}
             items={items}
           >

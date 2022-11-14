@@ -8,7 +8,7 @@ class UserStore {
   }
   getUserInfo = async () => {
     // 调用用户接口获取数据
-    const res = await http.get('/user/profile')
+    const res = await http.get('/accounts/user/profile')
     this.userInfo = res.data
   }
 }

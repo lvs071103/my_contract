@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import User from './pages/User'
 import Contract from './pages/Contract'
 import { history } from '@/utils/history'
+import Group from '@/pages/Group'
 
 export default class App extends Component {
   render () {
@@ -23,7 +24,10 @@ export default class App extends Component {
             </AuthRoute>
           }>
             <Route index element={<Home />}></Route>
-            <Route path='/user/' element={<User />}></Route>
+            {/* <Route path='/accounts' element={<User />}> */}
+            <Route path='/accounts/user/list' element={<User />}></Route>
+            <Route path='/accounts/group/list' element={<Group />}></Route>
+            {/* </Route> */}
             <Route path='/contract/' element={<Contract />}></Route>
           </Route>
           <Route path='/login/' element={<Login />}></Route>
