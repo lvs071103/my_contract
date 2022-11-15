@@ -8,7 +8,7 @@ class ChannelStore {
   }
   // article publish要用， 哪里调用这个函数呢？
   loadChannelList = async () => {
-    const res = await http.get('/group/list')
+    const res = await http.get('/accounts/group/list')
     // console.log("loadChannelStore")
     this.channelList = res.data.data
   }

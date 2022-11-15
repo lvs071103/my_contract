@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Tag, Input } from 'antd'
+import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Input, Modal } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import { http } from '@/utils'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
+import GroupForm from './group.From'
+import './index.scss'
 
 
 
@@ -60,6 +62,27 @@ const Group = () => {
   const navigate = useNavigate()
   const goPublish = (data) => {
     navigate(`/publish?id=${data.id}`)
+  }
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const showModal = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleOk = async () => {
+    // 关闭弹窗，并更新Groups
+    setIsModalOpen(false)
+    const res = await http.get('accounts/group/list', { params })
+    const { data, count } = res.data
+    setGroups({
+      list: data,
+      count: count,
+    })
+  }
+
+  const handleCancel = () => {
+    setIsModalOpen(false)
   }
 
   const columns = [
@@ -120,18 +143,26 @@ const Group = () => {
 
       <Card
         title={
-          <Button type="primary">Add</Button>
+          <Button type="primary" onClick={showModal}>Add</Button>
         }
 
         extra={
           <Search placeholder="input search text" onSearch='' enterButton />
         }
-        style={{
-
-        }}
       >
+        <Modal
+          title="添加"
+          open={isModalOpen}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          wrapClassName="vertical-center-modal"
+        >
+          <GroupForm handleOk={handleOk} onCancel={handleCancel} setGroups={setGroups} />
+        </Modal>
         <Table
-          rowKey="id"
+          rowKey={(record) => {
+            return (record.id)
+          }}
           columns={columns}
           dataSource={groups.list}
           pagination={

@@ -17,7 +17,7 @@ const GeekLayout = () => {
 
   const { pathname } = useLocation()
 
-  console.log(pathname)
+  // console.log(pathname)
 
   const { userStore, loginStore, channelStore, groupStore } = useStore()
   // 获取用户数据
@@ -33,7 +33,7 @@ const GeekLayout = () => {
     getItem(<Link to={'/'}>数据概览</Link>, '/', <DashboardFilled />),
     getItem(<Link to={'#'}>用户管理</Link>, 'parent-1', <TeamOutlined />,
       [
-        getItem(<Link to={'/accounts/group/list'}>用户组</Link>, '/accounts/goup/list'),
+        getItem(<Link to={'/accounts/group/list'}>用户组</Link>, '/accounts/group/list'),
         getItem(<Link to={'/accounts/user/list'}>用户</Link>, '/accounts/user/list'),
       ]),
     getItem(<Link to={'/contract'}>合同管理</Link>, '/contract', <EditOutlined />)
@@ -80,7 +80,7 @@ const GeekLayout = () => {
             theme="dark"
             defaultSelectedKeys={[pathname]}
             // 高亮原理： selectedKeys === item key
-            // selectedKeys={[pathname]}
+            selectedKeys={[pathname]}
             style={{ height: '100%', borderRight: 0 }}
             items={items}
           >

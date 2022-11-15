@@ -4,6 +4,7 @@ from django.core import serializers
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib.auth.models import User, Group
+from accounts.forms import GroupForm
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 import json
 # Create your views here.
@@ -50,7 +51,9 @@ class GroupListView(APIView):
         query_list = []
         groups = Group.objects.get_queryset().order_by('id')
         page = request.GET.get('page', 1)
-        page_size = request.GET.get('pageSize')
+        page_size = request.GET.get('pageSize', None)
+        if page_size is None:
+            page_size = 10
         paginator = Paginator(groups, page_size)
 
         try:
@@ -72,6 +75,34 @@ class GroupListView(APIView):
             "count": len(groups),
             'success': True,
         })
+
+
+class GroupFormView(APIView):
+    form_class = GroupForm
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        # form = self.form_class()
+        return JsonResponse({"message": "no post request!"})
+
+    def post(self, request):
+        data = {}
+        body = json.loads(request.body.decode('utf-8'))
+        try:
+            Group.objects.get(name=body['name'])
+            data = {
+                'success': False,
+                'message': '{} is exist!'.format(body['name']),
+                'status': 500
+            }
+        except Group.DoesNotExist:
+            form = self.form_class(body)
+            if form.is_valid:
+                form.save()
+            data['success'] = True
+            data['message'] = 'saved'
+
+        return JsonResponse(data)
 
 
 class UserProfileView(APIView):
