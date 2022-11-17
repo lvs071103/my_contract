@@ -23,6 +23,7 @@ class GroupForm extends React.Component {
 
   formRef = React.createRef()
 
+  // 提交时请求后端增加group接口
   onFinish = async (values) => {
     const response = await http.post('/accounts/group/add', {
       "name": values.name,
@@ -37,6 +38,7 @@ class GroupForm extends React.Component {
         showConfirmButton: false,
         timer: 1500
       })
+      // 关闭弹窗
       handleOk()
     } else {
       Swal.fire({
@@ -44,14 +46,10 @@ class GroupForm extends React.Component {
         title: 'Oops...',
         text: response.data.message,
       })
-      // }).then((result) => {
-      //   if (result.isConfirmed) {
-      //     onCancel()
-      //   }
-      // })
     }
   }
 
+  // 重置form表单
   onReset = () => {
     this.formRef.current.resetFields()
   }

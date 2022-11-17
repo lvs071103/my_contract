@@ -17,7 +17,7 @@ const GeekLayout = () => {
 
   const { pathname } = useLocation()
 
-  // console.log(pathname)
+  // pathname：url中的子路径
 
   const { userStore, loginStore, channelStore, groupStore } = useStore()
   // 获取用户数据

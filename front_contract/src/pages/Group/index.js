@@ -48,13 +48,13 @@ const Group = () => {
   }
 
   // 删除
-  const delArticle = async (data) => {
+  const delGroup = async (data, page) => {
     // console.log(data)
-    await http.delete(`/mp/articles/${data.id}`)
+    await http.delete(`/accounts/group/delete/${data.id}`)
     // 刷新一下列表
     setParams({
       ...params,
-      page: 1
+      page
     })
   }
 
@@ -107,7 +107,7 @@ const Group = () => {
             />
             <Popconfirm
               title="确认删除该条文章吗?"
-              onConfirm={() => delArticle(data)}
+              onConfirm={() => delGroup(data, params.page)}
               okText="确认"
               cancelText="取消"
             >

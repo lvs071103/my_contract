@@ -9,6 +9,7 @@ import User from './pages/User'
 import Contract from './pages/Contract'
 import { history } from '@/utils/history'
 import Group from '@/pages/Group'
+// import UseEffectTest from './tools/useEffectTest'
 
 export default class App extends Component {
   render () {
@@ -28,6 +29,7 @@ export default class App extends Component {
             <Route path='/accounts/user/list' element={<User />}></Route>
             <Route path='/accounts/group/list' element={<Group />}></Route>
             {/* </Route> */}
+            {/* <Route path='/test/' element={<UseEffectTest name='Jack.Z' />}></Route> */}
             <Route path='/contract/' element={<Contract />}></Route>
           </Route>
           <Route path='/login/' element={<Login />}></Route>
