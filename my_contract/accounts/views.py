@@ -28,7 +28,7 @@ class PermissionListView(APIView):
                 "content_type_id": item.content_type_id
             })
         return JsonResponse({
-            "data": query_list,
+            "permissions": query_list,
             "count": len(permissions),
             'success': True
         })
@@ -59,7 +59,6 @@ class UserListView(APIView):
             item['fields']['id'] = item['pk']
             query_list.append(item['fields'])
 
-        print(query_list)
         return JsonResponse({
             "data": query_list,
             "count": len(users),
@@ -74,13 +73,23 @@ class GroupListView(APIView):
 
     @staticmethod
     def get(request):
-        query_list = []
-        groups = Group.objects.get_queryset().order_by('id')
+        groups = []
+        group_obj = Group.objects.get_queryset().order_by('id')
+        perms_obj = Permission.objects.all()
+        perms_list = []
+        for item in perms_obj:
+            perms_list.append({
+                'id': item.id,
+                'name': item.name,
+                'codename': item.codename,
+                'content_type_id': item.content_type_id
+            })
         page = request.GET.get('page', 1)
         page_size = request.GET.get('pageSize', None)
+
         if page_size is None:
             page_size = 10
-        paginator = Paginator(groups, page_size)
+        paginator = Paginator(group_obj, page_size)
 
         try:
             page_obj = paginator.get_page(page)
@@ -90,21 +99,26 @@ class GroupListView(APIView):
             page_obj = paginator.page(paginator.num_pages)
 
         for item in page_obj:
-            query_list.append({'id': item.id, 'name': item.name})
+            groups.append({
+                'id': item.id,
+                'name': item.name,
+            })
 
         return JsonResponse({
-            "data": query_list,
-            "count": len(groups),
+            "groups": groups,
+            "count": len(group_obj),
             'success': True,
+            'permissions': perms_list
         })
 
 
-class GroupFormView(APIView):
+class GroupCreateView(APIView):
     form_class = GroupForm
     permission_classes = (IsAuthenticated, )
     model = Group
 
     def get(self, request):
+        # print(self.form_class())
         return JsonResponse({
             "message":
             'this is only {} request'.format(str(request.method).lower())
@@ -121,8 +135,11 @@ class GroupFormView(APIView):
             }
         except Group.DoesNotExist:
             form = self.form_class(body)
+            print(body)
             if form.is_valid:
-                form.save()
+                todo = form.save(commit=False)
+                todo.save()
+                form.save_m2m()
                 data['success'] = True
                 data['message'] = 'saved'
             else:
@@ -138,9 +155,8 @@ class GroupUpdateView(APIView):
     my_module = Group
     form_class = GroupForm
     permission_classes = (IsAuthenticated, )
-    serializer_class = GroupSerializer
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         return JsonResponse({
             "message":
             "this is only {} request".format(str(request.method).lower()),
@@ -179,20 +195,20 @@ class GroupDeleteView(APIView):
             return self.post(*args, **kwargs)
         return super(GroupDeleteView, self).dispatch(*args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         return JsonResponse({
             "message":
             "this is only {} request".format(str(request.method).lower()),
         })
 
-    def delete(self, request, *args, **kwargs):
+    def delete(self, *args, **kwargs):
         try:
             get_object_or_404(self.model, pk=kwargs['pk']).delete()
         except self.model.DoesNotExist:
             raise Http404
         return JsonResponse({'success': True, 'message': 'deleted!'})
 
-    def post(self, request, *args, **kwargs):
+    def post(self, *args, **kwargs):
         try:
             get_object_or_404(self.model, pk=kwargs['pk']).delete()
         except self.model.DoesNotExist:

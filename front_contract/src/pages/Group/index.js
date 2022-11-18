@@ -24,15 +24,24 @@ const Group = () => {
     pageSize: 10
   })
 
+  // 初始化组权限
+  const [permissions, setPermissions] = useState({
+    list: [],
+  })
+
   useEffect(() => {
     const loadList = async () => {
-      const res = await http.get('accounts/group/list', { params })
+      const res1 = await http.get('accounts/group/list', { params })
+      const res2 = await http.get('accounts/permission/list')
       // console.log("response: ", res.data)
-      const { data, count } = res.data
-      // console.log(count)
+      const { groups, count } = res1.data
+      const { permissions } = res2.data
       setGroups({
-        list: data,
+        list: groups,
         count: count,
+      })
+      setPermissions({
+        list: permissions
       })
     }
     loadList()
@@ -49,7 +58,6 @@ const Group = () => {
 
   // 删除
   const delGroup = async (data, page) => {
-    // console.log(data)
     await http.delete(`/accounts/group/delete/${data.id}`)
     // 刷新一下列表
     setParams({
@@ -74,9 +82,9 @@ const Group = () => {
     // 关闭弹窗，并更新Groups
     setIsModalOpen(false)
     const res = await http.get('accounts/group/list', { params })
-    const { data, count } = res.data
+    const { groups, count } = res.data
     setGroups({
-      list: data,
+      list: groups,
       count: count,
     })
   }
@@ -156,8 +164,13 @@ const Group = () => {
           onOk={handleOk}
           onCancel={handleCancel}
           wrapClassName="vertical-center-modal"
+          width={860}
         >
-          <GroupForm handleOk={handleOk} onCancel={handleCancel} setGroups={setGroups} />
+          <GroupForm
+            handleOk={handleOk}
+            onCancel={handleCancel}
+            setGroups={setGroups}
+            permissions={permissions.list} />
         </Modal>
         <Table
           rowKey={(record) => {
