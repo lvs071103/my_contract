@@ -1,11 +1,10 @@
-import { Button, Form, Input, Select } from 'antd'
 import React, { useState } from 'react'
+import { Button, Form, Input, Select } from 'antd'
 import Swal from 'sweetalert2'
 import { http } from '@/utils'
-import './index.scss'
 
 
-const GroupForm = (props) => {
+export default function GroupEdit (props) {
   const options = []
   const perms = props.permissions
   perms.map((element) => {
@@ -47,7 +46,7 @@ const GroupForm = (props) => {
   // 提交时请求后端增加group接口
   const onFinish = async (values) => {
     console.log(values.name, values.Permissions)
-    const response = await http.post('/accounts/group/add', {
+    const response = await http.post(`/accounts/group/edit/${props.id}`, {
       "name": values.name,
       "permissions": values.Permissions
     })
@@ -110,5 +109,3 @@ const GroupForm = (props) => {
     </Form>
   )
 }
-
-export default GroupForm

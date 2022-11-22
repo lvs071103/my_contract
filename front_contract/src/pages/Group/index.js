@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Input, Modal } from 'antd'
+import React, { useEffect, useState, useRef } from 'react'
+import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Input, Modal, Pagination } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import { http } from '@/utils'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
-import GroupForm from './group.From'
 import './index.scss'
+import GroupForm from './group.From'
+import GroupEdit from './group.Edit'
 
 
 
@@ -29,6 +30,10 @@ const Group = () => {
     list: [],
   })
 
+  const [title, setTitle] = useState('')
+
+  const [cursor, setCursor] = useState(0)
+
   useEffect(() => {
     const loadList = async () => {
       const res1 = await http.get('accounts/group/list', { params })
@@ -48,11 +53,13 @@ const Group = () => {
   }, [params])
 
 
-  // 切换当前页触发
-  const pageChange = (page) => {
+  // 切换当前页或者调整每页显示数量
+  const pageChange = (page, newPageSize) => {
+    // console.log(page, newPageSize)
     setParams({
       ...params,
-      page
+      page: params.pageSize !== newPageSize ? 1 : page,
+      pageSize: newPageSize
     })
   }
 
@@ -66,16 +73,19 @@ const Group = () => {
     })
   }
 
-  // 编辑
-  const navigate = useNavigate()
-  const goPublish = (data) => {
-    navigate(`/publish?id=${data.id}`)
-  }
-
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const showModal = () => {
+  // 弹出添加窗口
+  const showAddModal = () => {
+    setTitle('添加')
     setIsModalOpen(true)
+  }
+
+  // 弹出编辑窗口
+  const showEditModal = (data) => {
+    setTitle('编辑')
+    setIsModalOpen(true)
+    setCursor(data.id)
   }
 
   const handleOk = async () => {
@@ -103,6 +113,34 @@ const Group = () => {
       dataIndex: 'name',
     },
     {
+      title: '权限',
+      key: 'permission',
+      dataIndex: 'permission',
+      // 调整列宽，超出部分隐藏并用...显示
+      onCell: () => {
+        return {
+          style: {
+            maxWidth: 160,
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            cursor: 'pointer'
+          }
+        }
+      },
+      // 显示一列数组值的显示
+      render: (text, record) => (
+        <>
+          {record.perm_list.map((item) => {
+            return (
+              <span key={item.id}> {item.codename} </span>
+            )
+          })}
+        </>
+      )
+    },
+
+    {
       title: '操作',
       render: data => {
         return (
@@ -111,7 +149,7 @@ const Group = () => {
               type="primary"
               shape="circle"
               icon={<EditOutlined />}
-              onClick={() => goPublish(data)}
+              onClick={() => { showEditModal(data) }}
             />
             <Popconfirm
               title="确认删除该条文章吗?"
@@ -151,7 +189,7 @@ const Group = () => {
 
       <Card
         title={
-          <Button type="primary" onClick={showModal}>Add</Button>
+          <Button type="primary" onClick={showAddModal}>Add</Button>
         }
 
         extra={
@@ -159,18 +197,21 @@ const Group = () => {
         }
       >
         <Modal
-          title="添加"
+          title={title}
           open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}
-          wrapClassName="vertical-center-modal"
+          permissions={permissions}
           width={860}
+          centered
         >
-          <GroupForm
+          {title === '添加' ? <GroupForm
             handleOk={handleOk}
             onCancel={handleCancel}
             setGroups={setGroups}
-            permissions={permissions.list} />
+            permissions={permissions.list} /> : <GroupEdit
+            id={cursor}
+            permissions={permissions.list} />}
         </Modal>
         <Table
           rowKey={(record) => {
@@ -180,9 +221,11 @@ const Group = () => {
           dataSource={groups.list}
           pagination={
             {
+              defaultCurrent: params.page,
               pageSize: params.pageSize,
               total: groups.count,
-              onChange: pageChange
+              onChange: pageChange,
+              className: "pagination",
             }
           }
         />

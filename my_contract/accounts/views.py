@@ -99,16 +99,24 @@ class GroupListView(APIView):
             page_obj = paginator.page(paginator.num_pages)
 
         for item in page_obj:
+            perm_list = []
+            for element in item.permissions.all():
+                perm_list.append({
+                    "id": element.id,
+                    "name": element.name,
+                    "codename": element.codename
+                })
             groups.append({
                 'id': item.id,
                 'name': item.name,
+                'perm_list': perm_list
             })
 
         return JsonResponse({
             "groups": groups,
             "count": len(group_obj),
             'success': True,
-            'permissions': perms_list
+            'all_perms': perms_list
         })
 
 
