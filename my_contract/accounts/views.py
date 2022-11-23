@@ -69,21 +69,10 @@ class UserListView(APIView):
 class GroupListView(APIView):
     permission_classes = (IsAuthenticated, )
     # 数据序列化
-    serializer_class = GroupSerializer
+    serializer_for_group = GroupSerializer
 
-    @staticmethod
-    def get(request):
-        groups = []
+    def get(self, request):
         group_obj = Group.objects.get_queryset().order_by('id')
-        perms_obj = Permission.objects.all()
-        perms_list = []
-        for item in perms_obj:
-            perms_list.append({
-                'id': item.id,
-                'name': item.name,
-                'codename': item.codename,
-                'content_type_id': item.content_type_id
-            })
         page = request.GET.get('page', 1)
         page_size = request.GET.get('pageSize', None)
 
@@ -98,25 +87,12 @@ class GroupListView(APIView):
         except EmptyPage:
             page_obj = paginator.page(paginator.num_pages)
 
-        for item in page_obj:
-            perm_list = []
-            for element in item.permissions.all():
-                perm_list.append({
-                    "id": element.id,
-                    "name": element.name,
-                    "codename": element.codename
-                })
-            groups.append({
-                'id': item.id,
-                'name': item.name,
-                'perm_list': perm_list
-            })
+        serializer = self.serializer_for_group(page_obj, many=True)
 
         return JsonResponse({
-            "groups": groups,
+            "groups": serializer.data,
             "count": len(group_obj),
             'success': True,
-            'all_perms': perms_list
         })
 
 

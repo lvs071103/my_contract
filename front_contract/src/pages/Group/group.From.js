@@ -9,7 +9,7 @@ const GroupForm = (props) => {
   const options = []
   const perms = props.permissions
   perms.map((element) => {
-    return options.push({ label: `Label: ${element.codename}`, value: element.id })
+    return options.push({ label: `Label: ${element.name}`, value: element.id })
   })
   const handleOk = props.handleOk
   const formRef = React.createRef()
@@ -43,6 +43,8 @@ const GroupForm = (props) => {
     placeholder: 'Select Item...',
     maxTagCount: 'responsive',
   }
+
+  console.log(value)
 
   // 提交时请求后端增加group接口
   const onFinish = async (values) => {

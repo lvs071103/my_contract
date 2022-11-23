@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Input, Modal, Pagination } from 'antd'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Input, Modal } from 'antd'
+import { Link } from 'react-router-dom'
 import { http } from '@/utils'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
@@ -26,28 +26,27 @@ const Group = () => {
   })
 
   // 初始化组权限
-  const [permissions, setPermissions] = useState({
-    list: [],
-  })
+  const [permissions, setPermissions] = useState([])
 
   const [title, setTitle] = useState('')
 
-  const [cursor, setCursor] = useState(0)
+  const [cursor, setCursor] = useState({
+    id: 0,
+    name: ''
+  })
+  const [selected, setSelected] = useState([])
 
   useEffect(() => {
     const loadList = async () => {
       const res1 = await http.get('accounts/group/list', { params })
       const res2 = await http.get('accounts/permission/list')
-      // console.log("response: ", res.data)
       const { groups, count } = res1.data
       const { permissions } = res2.data
       setGroups({
         list: groups,
         count: count,
       })
-      setPermissions({
-        list: permissions
-      })
+      setPermissions(permissions)
     }
     loadList()
   }, [params])
@@ -55,7 +54,6 @@ const Group = () => {
 
   // 切换当前页或者调整每页显示数量
   const pageChange = (page, newPageSize) => {
-    // console.log(page, newPageSize)
     setParams({
       ...params,
       page: params.pageSize !== newPageSize ? 1 : page,
@@ -85,7 +83,13 @@ const Group = () => {
   const showEditModal = (data) => {
     setTitle('编辑')
     setIsModalOpen(true)
-    setCursor(data.id)
+    setCursor(
+      {
+        id: data.id,
+        name: data.name
+      }
+    )
+    setSelected(data.permissions)
   }
 
   const handleOk = async () => {
@@ -114,8 +118,8 @@ const Group = () => {
     },
     {
       title: '权限',
-      key: 'permission',
-      dataIndex: 'permission',
+      key: 'permissions',
+      dataIndex: 'permissions',
       // 调整列宽，超出部分隐藏并用...显示
       onCell: () => {
         return {
@@ -129,11 +133,11 @@ const Group = () => {
         }
       },
       // 显示一列数组值的显示
-      render: (text, record) => (
+      render: (_, record) => (
         <>
-          {record.perm_list.map((item) => {
+          {record.permissions.map((item) => {
             return (
-              <span key={item.id}> {item.codename} </span>
+              <span key={item.id}> {item.name} </span>
             )
           })}
         </>
@@ -209,9 +213,11 @@ const Group = () => {
             handleOk={handleOk}
             onCancel={handleCancel}
             setGroups={setGroups}
-            permissions={permissions.list} /> : <GroupEdit
-            id={cursor}
-            permissions={permissions.list} />}
+            permissions={permissions} /> : <GroupEdit
+            cursor={cursor}
+            permissions={permissions}
+            selected={selected}
+          />}
         </Modal>
         <Table
           rowKey={(record) => {

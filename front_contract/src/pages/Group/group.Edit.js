@@ -2,17 +2,26 @@ import React, { useState } from 'react'
 import { Button, Form, Input, Select } from 'antd'
 import Swal from 'sweetalert2'
 import { http } from '@/utils'
+import { useEffect } from 'react'
 
 
 export default function GroupEdit (props) {
   const options = []
-  const perms = props.permissions
-  perms.map((element) => {
-    return options.push({ label: `Label: ${element.codename}`, value: element.id })
+  const { cursor, permissions, handleOk, selected } = props
+
+  // 所有权限列表
+  permissions.map((element) => {
+    return options.push({ label: `Label: ${element.name}`, value: element.id })
   })
-  const handleOk = props.handleOk
-  const formRef = React.createRef()
+
+  // 处理已选中的权限
+  const selectArr = []
+  selected.map((item) => {
+    return selectArr.push(item.id)
+  })
   const [value, setValue] = useState([])
+
+  const formRef = React.createRef()
 
   const layout = {
     labelCol: {
@@ -45,7 +54,6 @@ export default function GroupEdit (props) {
 
   // 提交时请求后端增加group接口
   const onFinish = async (values) => {
-    console.log(values.name, values.Permissions)
     const response = await http.post(`/accounts/group/edit/${props.id}`, {
       "name": values.name,
       "permissions": values.Permissions
@@ -69,6 +77,14 @@ export default function GroupEdit (props) {
     }
   }
 
+  useEffect(() => {
+    setValue(selectArr)
+    formRef.current.setFieldsValue({
+      name: cursor.name,
+      Permissions: selectProps
+    })
+  }, [cursor])
+
   // 重置form表单
   const onReset = () => {
     this.formRef.current.resetFields()
@@ -79,6 +95,8 @@ export default function GroupEdit (props) {
       {...layout}
       ref={formRef}
       name="control-ref"
+      // 给定初始值 
+      // initialValues={{ name: cursor.name }}
       onFinish={onFinish}
     >
       <Form.Item
@@ -96,7 +114,7 @@ export default function GroupEdit (props) {
         name="Permissions"
         label="Permissions"
       >
-        <Select  {...selectProps} />
+        <Select {...selectProps} />
       </Form.Item>
       <Form.Item {...tailLayout}>
         <Button type="primary" htmlType="submit">
