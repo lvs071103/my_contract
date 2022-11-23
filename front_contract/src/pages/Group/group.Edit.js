@@ -5,7 +5,7 @@ import { http } from '@/utils'
 import { useEffect } from 'react'
 
 
-export default function GroupEdit (props) {
+function GroupEdit (props) {
   const options = []
   const { cursor, permissions, handleOk, selected } = props
 
@@ -14,12 +14,14 @@ export default function GroupEdit (props) {
     return options.push({ label: `Label: ${element.name}`, value: element.id })
   })
 
+
   // 处理已选中的权限
-  const selectArr = []
+  const selectList = []
   selected.map((item) => {
-    return selectArr.push(item.id)
+    return selectList.push(item.id)
   })
-  const [value, setValue] = useState([])
+
+  const [value, setValue] = useState(selectList)
 
   const formRef = React.createRef()
 
@@ -77,17 +79,18 @@ export default function GroupEdit (props) {
     }
   }
 
+  // 当记录发生变化时，为form设置初始值
   useEffect(() => {
-    setValue(selectArr)
     formRef.current.setFieldsValue({
       name: cursor.name,
-      Permissions: selectProps
+      Permissions: selectList
     })
-  }, [cursor])
+    // eslint-disable-next-line
+  }, [cursor.name, selectList])
 
   // 重置form表单
   const onReset = () => {
-    this.formRef.current.resetFields()
+    formRef.current.resetFields()
   }
 
   return (
@@ -96,7 +99,7 @@ export default function GroupEdit (props) {
       ref={formRef}
       name="control-ref"
       // 给定初始值 
-      // initialValues={{ name: cursor.name }}
+      // initialValues={{ name: cursor.name, Permissions: value }}
       onFinish={onFinish}
     >
       <Form.Item
@@ -127,3 +130,6 @@ export default function GroupEdit (props) {
     </Form>
   )
 }
+
+
+export default GroupEdit
