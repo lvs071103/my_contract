@@ -18,17 +18,10 @@ class PermissionListView(APIView):
     serializer_class = PermissionSerializer
 
     def get(self, request):
-        query_list = []
         permissions = self.my_model.objects.get_queryset().order_by('id')
-        for item in permissions:
-            query_list.append({
-                "id": item.id,
-                "name": item.name,
-                "codename": item.codename,
-                "content_type_id": item.content_type_id
-            })
+        serializer = self.serializer_class(permissions, many=True)
         return JsonResponse({
-            "permissions": query_list,
+            "permissions": serializer.data,
             "count": len(permissions),
             'success': True
         })
@@ -119,7 +112,6 @@ class GroupCreateView(APIView):
             }
         except Group.DoesNotExist:
             form = self.form_class(body)
-            print(body)
             if form.is_valid:
                 todo = form.save(commit=False)
                 todo.save()
@@ -150,8 +142,8 @@ class GroupUpdateView(APIView):
         form = self.form_class()
         data = {}
         group_obj = self.my_module.objects.get(pk=kwargs['pk'])
-        form = self.form_class(data=request.body.decode('utf-8'),
-                               instance=group_obj)
+        body = json.loads(request.body.decode('utf-8'))
+        form = self.form_class(data=body, instance=group_obj)
         if form.is_valid():
             form.save()
             data['success'] = True

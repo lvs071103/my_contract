@@ -56,7 +56,7 @@ function GroupEdit (props) {
 
   // 提交时请求后端增加group接口
   const onFinish = async (values) => {
-    const response = await http.post(`/accounts/group/edit/${props.id}`, {
+    const response = await http.post(`/accounts/group/edit/${cursor.id}`, {
       "name": values.name,
       "permissions": values.Permissions
     })
@@ -85,8 +85,9 @@ function GroupEdit (props) {
       name: cursor.name,
       Permissions: selectList
     })
+    setValue(selectList)
     // eslint-disable-next-line
-  }, [cursor.name, selectList])
+  }, [cursor.name, selected])
 
   // 重置form表单
   const onReset = () => {

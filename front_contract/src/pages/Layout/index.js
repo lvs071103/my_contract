@@ -19,15 +19,15 @@ const GeekLayout = () => {
 
   // pathname：url中的子路径
 
-  const { userStore, loginStore, channelStore, groupStore } = useStore()
+  const { userStore, loginStore, permsStore, groupStore } = useStore()
   // 获取用户数据
   useEffect(() => {
     try {
       userStore.getUserInfo()
-      channelStore.loadChannelList()
+      permsStore.loadChannelList()
       groupStore.loadGroupList()
     } catch { }
-  }, [userStore, channelStore, groupStore])
+  }, [userStore, permsStore, groupStore])
 
   const items = [
     getItem(<Link to={'/'}>数据概览</Link>, '/', <DashboardFilled />),

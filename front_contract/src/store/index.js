@@ -3,7 +3,7 @@
 import LoginStore from "./login.Store"
 import React from "react"
 import UserStore from "./user.Store"
-import ChannelStore from "./channel.Store"
+import PermsStore from "./perms.Store"
 import GroupStore from "./group.Store"
 
 class RootStore {
@@ -11,7 +11,7 @@ class RootStore {
     this.loginStore = new LoginStore()
     this.userStore = new UserStore()
     this.groupStore = new GroupStore()
-    this.channelStore = new ChannelStore()
+    this.permsStore = new PermsStore()
   }
 }
 
