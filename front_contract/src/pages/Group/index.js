@@ -211,9 +211,11 @@ const Group = () => {
         >
           {title === '添加' ? <GroupForm
             handleOk={handleOk}
-            onCancel={handleCancel}
+            // onCancel={handleCancel}
             setGroups={setGroups}
             permissions={permissions} /> : <GroupEdit
+            handleOk={handleOk}
+            // onCancel={handleCancel}
             cursor={cursor}
             permissions={permissions}
             selected={selected}

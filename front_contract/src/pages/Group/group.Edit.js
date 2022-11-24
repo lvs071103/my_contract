@@ -7,7 +7,7 @@ import { useEffect } from 'react'
 
 function GroupEdit (props) {
   const options = []
-  const { cursor, permissions, handleOk, selected } = props
+  const { cursor, permissions, selected, handleOk } = props
 
   // 所有权限列表
   permissions.map((element) => {

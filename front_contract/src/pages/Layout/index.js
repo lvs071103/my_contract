@@ -24,7 +24,7 @@ const GeekLayout = () => {
   useEffect(() => {
     try {
       userStore.getUserInfo()
-      permsStore.loadChannelList()
+      permsStore.loadPermslList()
       groupStore.loadGroupList()
     } catch { }
   }, [userStore, permsStore, groupStore])
