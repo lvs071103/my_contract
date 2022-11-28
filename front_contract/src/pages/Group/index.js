@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Input, Modal } from 'antd'
 import { Link } from 'react-router-dom'
 import { http } from '@/utils'
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { EditOutlined, DeleteOutlined, UnorderedListOutlined } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
 import './index.scss'
 import GroupForm from './group.From'
 import GroupEdit from './group.Edit'
+import GroupDetail from './group.Detail'
 
 
 
@@ -34,6 +35,7 @@ const Group = () => {
     id: 0,
     name: ''
   })
+
   const [selected, setSelected] = useState([])
 
   useEffect(() => {
@@ -92,10 +94,31 @@ const Group = () => {
     setSelected(data.permissions)
   }
 
+  const showDetailModal = (data) => {
+    setTitle('详情')
+    setIsModalOpen(true)
+    setCursor(
+      {
+        id: data.id,
+        name: data.name
+      }
+    )
+    setSelected(data.permissions)
+  }
+
   const handleOk = async () => {
     // 关闭弹窗，并更新Groups
     setIsModalOpen(false)
     const res = await http.get('accounts/group/list', { params })
+    const { groups, count } = res.data
+    setGroups({
+      list: groups,
+      count: count,
+    })
+  }
+  // 搜索
+  const onSearch = async (data) => {
+    const res = await http.get(`accounts/group/search/?q=${data}`)
     const { groups, count } = res.data
     setGroups({
       list: groups,
@@ -170,6 +193,14 @@ const Group = () => {
               />
             </Popconfirm>
 
+            <Button
+              type="primary"
+              ghost
+              shape="circle"
+              icon={<UnorderedListOutlined />}
+              onClick={() => { showDetailModal(data) }}
+            />
+
           </Space>
         )
       }
@@ -197,7 +228,7 @@ const Group = () => {
         }
 
         extra={
-          <Search placeholder="input search text" onSearch='' enterButton />
+          <Search placeholder="input search text" onSearch={onSearch} enterButton />
         }
       >
         <Modal
@@ -213,9 +244,13 @@ const Group = () => {
             handleOk={handleOk}
             // onCancel={handleCancel}
             setGroups={setGroups}
-            permissions={permissions} /> : <GroupEdit
-            handleOk={handleOk}
-            // onCancel={handleCancel}
+            permissions={permissions} /> : title === '编辑' ? <GroupEdit
+              handleOk={handleOk}
+              // onCancel={handleCancel}
+              cursor={cursor}
+              permissions={permissions}
+              selected={selected}
+            /> : <GroupDetail
             cursor={cursor}
             permissions={permissions}
             selected={selected}

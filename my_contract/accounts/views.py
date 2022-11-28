@@ -1,12 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from django.core import serializers
 from django.http import JsonResponse, Http404
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.models import User, Group, Permission
 from accounts.forms import GroupForm
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from accounts.serializers import GroupSerializer, PermissionSerializer
+from accounts.serializers import GroupSerializer, PermissionSerializer, UserSerializer
+from django.db.models import Q
 # from rest_framework.decorators import api_view
 import json
 # Create your views here.
@@ -29,13 +29,17 @@ class PermissionListView(APIView):
 
 class UserListView(APIView):
     permission_classes = (IsAuthenticated, )
+    # 序列化
+    serializer_class = UserSerializer
 
-    @staticmethod
-    def get(request):
-        query_list = []
+    def get(self, request):
         users = User.objects.get_queryset().order_by('id')
         page = request.GET.get('page', 1)
-        page_size = request.GET.get('pageSize')
+        page_size = request.GET.get('pageSize', None)
+
+        if page_size is None:
+            page_size = 10
+
         paginator = Paginator(users, page_size)
 
         try:
@@ -45,15 +49,10 @@ class UserListView(APIView):
         except EmptyPage:
             page_obj = paginator.page(paginator.num_pages)
 
-        users_as_json = serializers.serialize('json', page_obj)
-        user_list = json.loads(users_as_json)
-
-        for item in user_list:
-            item['fields']['id'] = item['pk']
-            query_list.append(item['fields'])
+        user_serializers = self.serializer_class(page_obj, many=True)
 
         return JsonResponse({
-            "data": query_list,
+            "data": user_serializers.data,
             "count": len(users),
             'success': True
         })
@@ -71,6 +70,7 @@ class GroupListView(APIView):
 
         if page_size is None:
             page_size = 10
+
         paginator = Paginator(group_obj, page_size)
 
         try:
@@ -192,17 +192,70 @@ class GroupDeleteView(APIView):
         return JsonResponse({'success': True, 'message': 'deleted!'})
 
 
+class GroupDetailView(APIView):
+    permission_classes = (IsAuthenticated, )
+    group_serializers = GroupSerializer
+
+    def get(self, request, pk):
+        try:
+            groups = Group.objects.get(pk=pk)
+        except Group.DoesNotExist:
+            raise Http404
+
+        group_serializers = self.group_serializers(groups, many=True)
+
+        return JsonResponse({
+            "groups": group_serializers.data,
+            "count": len(groups),
+            'success': True,
+        })
+
+
+class GroupSearchView(APIView):
+    permission_classes = (IsAuthenticated, )
+    group_serializers = GroupSerializer
+    model = Group
+
+    def get(self, request):
+        search_string = request.GET.get('q', None)
+        print(search_string)
+        if search_string:
+            groups = self.model.objects.filter(
+                Q(name=search_string)).order_by('id')
+            count = self.model.objects.filter(Q(name=search_string)).count()
+
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('pageSize', None)
+
+        if page_size is None:
+            page_size = 10
+
+        paginator = Paginator(groups, page_size)
+
+        try:
+            page_obj = paginator.get_page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        sa = self.group_serializers(groups, many=True)
+
+        return JsonResponse({
+            "groups": sa.data,
+            "count": count,
+            'success': True,
+        })
+
+
 class UserProfileView(APIView):
     permission_classes = (IsAuthenticated, )
+    user_serializers = UserSerializer
 
-    @staticmethod
-    def get(request):
+    def get(self, request):
         user = User.objects.get(username=request.user.username)
+        sa = self.user_serializers(user)
         if user:
-            users_as_json = serializers.serialize('json', [
-                user,
-            ])
-            elment = json.loads(users_as_json)[0]
-            return JsonResponse(elment['fields'])
+            return JsonResponse(sa.data)
         else:
             return redirect('/api/login')

@@ -15,5 +15,10 @@ urlpatterns = [
     re_path(r'group/edit/(?P<pk>\d+)$',
             views.GroupUpdateView.as_view(),
             name='group_edit'),
+    re_path(r'group/detail/(?P<pk>\d+)$',
+            views.GroupDetailView.as_view(),
+            name='group_detail'),
+    path('group/search/', views.GroupSearchView.as_view(),
+         name='group_search'),
     path('user/profile', views.UserProfileView.as_view(), name='user_profile'),
 ]

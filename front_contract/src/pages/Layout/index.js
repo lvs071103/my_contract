@@ -17,6 +17,8 @@ const GeekLayout = () => {
 
   const { pathname } = useLocation()
 
+  // const [collapsed, setCollapsed] = useState(false)
+
   // pathname：url中的子路径
 
   const { userStore, loginStore, permsStore, groupStore } = useStore()
@@ -31,12 +33,16 @@ const GeekLayout = () => {
 
   const items = [
     getItem(<Link to={'/'}>数据概览</Link>, '/', <DashboardFilled />),
-    getItem(<Link to={'#'}>用户管理</Link>, 'parent-1', <TeamOutlined />,
+    getItem('用户管理', 'sub1', <TeamOutlined />,
       [
         getItem(<Link to={'/accounts/group/list'}>用户组</Link>, '/accounts/group/list'),
         getItem(<Link to={'/accounts/user/list'}>用户</Link>, '/accounts/user/list'),
       ]),
-    getItem(<Link to={'/contract'}>合同管理</Link>, '/contract', <EditOutlined />)
+    getItem('合同管理', 'sub2', <EditOutlined />,
+      [
+        // getItem(<Link to={'/provider'}>供应商</Link>, '/provider'),
+        getItem(<Link to={'/contract'}>合同管理</Link>, '/contract'),
+      ]),
   ]
 
   function getItem (label, key, icon, children) {
@@ -82,6 +88,7 @@ const GeekLayout = () => {
             // 高亮原理： selectedKeys === item key
             selectedKeys={[pathname]}
             style={{ height: '100%', borderRight: 0 }}
+            // inlineCollapsed={collapsed}
             items={items}
           >
           </Menu>
