@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Tag, Input } from 'antd'
+import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Tag, Input, Modal } from 'antd'
 import 'moment/locale/zh-cn'
-// import locale from 'antd/es/date-picker/locale/zh_CN'
 import './index.scss'
-// import { useStore } from '@/store'
 import { http } from '@/utils'
-// import img404 from '@/assets/error.png'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { observer } from 'mobx-react-lite'
+import { useStore } from '@/store'
+import UserForm from './user.Form'
 
 
 const { Search } = Input
@@ -27,6 +26,10 @@ const User = () => {
     pageSize: 10
   })
 
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [title, setTitle] = useState('')
+  const { permsStore, groupStore } = useStore()
+
   // 如果异步请求函数需要依赖一些数据的变化而重新执行
   // 推荐把它写在内部
   // 统一不抽离函数到外面 只要涉及到异步请求的函数 都放到useEffect内部
@@ -37,9 +40,7 @@ const User = () => {
   useEffect(() => {
     const loadList = async () => {
       const res = await http.get('accounts/user/list', { params })
-      // console.log("response: ", res.data)
       const { data, count } = res.data
-      // console.log(count)
       setUsers({
         list: data,
         count: count,
@@ -47,6 +48,13 @@ const User = () => {
     }
     loadList()
   }, [params])
+
+
+  // 弹出添加窗口
+  const showAddModal = () => {
+    setTitle('添加')
+    setIsModalOpen(true)
+  }
 
 
   // 切换当前页触发
@@ -72,6 +80,15 @@ const User = () => {
   const navigate = useNavigate()
   const goPublish = (data) => {
     navigate(`/publish?id=${data.id}`)
+  }
+
+  const handleOk = async () => {
+    // 关闭弹窗，并更新users
+    setIsModalOpen(false)
+  }
+
+  const handleCancel = () => {
+    setIsModalOpen(false)
   }
 
   const columns = [
@@ -154,7 +171,7 @@ const User = () => {
 
       <Card
         title={
-          <Button type="primary">Add</Button>
+          <Button type="primary" onClick={showAddModal}>Add</Button>
         }
 
         extra={
@@ -164,6 +181,20 @@ const User = () => {
 
         }}
       >
+        <Modal
+          title={title}
+          open={isModalOpen}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          width={860}
+          centered
+        >
+          <UserForm
+            permissions={permsStore.permsList}
+            groups={groupStore.groupList}
+            handleOk={handleOk}
+          />
+        </Modal>
         <Table
           rowKey="id"
           columns={columns}

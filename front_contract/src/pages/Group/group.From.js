@@ -44,8 +44,6 @@ const GroupForm = (props) => {
     maxTagCount: 'responsive',
   }
 
-  console.log(value)
-
   // 提交时请求后端增加group接口
   const onFinish = async (values) => {
     console.log(values.name, values.Permissions)

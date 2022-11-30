@@ -9,8 +9,8 @@ class GroupStore {
   // group用户组信息调用该函数
   loadGroupList = async () => {
     const res = await http.get('/accounts/group/list')
-    // console.log("loadGroupList")
-    this.groupList = res.data.data
+    // console.log(res.data)
+    this.groupList = res.data.groups
   }
 }
 

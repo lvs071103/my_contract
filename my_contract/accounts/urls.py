@@ -7,6 +7,7 @@ urlpatterns = [
          views.PermissionListView.as_view(),
          name='permission_list'),
     path('user/list', views.UserListView.as_view(), name='user_list'),
+    path('user/add', views.UserCreateView.as_view(), name='user_add'),
     path('group/list', views.GroupListView.as_view(), name='group_list'),
     path('group/add', views.GroupCreateView.as_view(), name='group_add'),
     re_path(r'group/delete/(?P<pk>\d+)$',

@@ -3,10 +3,11 @@ from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.models import User, Group, Permission
-from accounts.forms import GroupForm
+from accounts.forms import GroupForm, UserForm
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from accounts.serializers import GroupSerializer, PermissionSerializer, UserSerializer
 from django.db.models import Q
+from django.contrib.auth.forms import UserCreationForm
 # from rest_framework.decorators import api_view
 import json
 # Create your views here.
@@ -58,6 +59,46 @@ class UserListView(APIView):
         })
 
 
+class UserCreateView(APIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = UserSerializer
+    model = User
+    class_form = UserForm
+
+    def get(self, request):
+        form = UserCreationForm()
+        return JsonResponse({
+            "message":
+            "this is only {} request".format(str(request.method).lower()),
+        })
+
+    def post(self, request):
+        data = {}
+        body = json.loads(request.body.decode('utf-8'))
+        # try:
+        #     self.model.objects.get(username=body['username'])
+        #     data = {
+        #         'success': False,
+        #         'message': '{} is exist!'.format(body['username']),
+        #     }
+        # except self.model.DoesNotExist:
+        form = self.class_form(body)
+        if form.is_valid():
+            print(body)
+            form.save()
+            # user = form.save(commit=True)
+            # user.save()
+            # form.save_m2m()
+            data['success'] = True
+            data['message'] = 'saved'
+        else:
+            for field, errors in form.errors.items():
+                error = 'Field: {} Errors: {}'.format(field, ','.join(errors))
+                data = {'success': False, 'message': error}
+
+        return JsonResponse(data)
+
+
 class GroupListView(APIView):
     permission_classes = (IsAuthenticated, )
     # 数据序列化
@@ -69,18 +110,17 @@ class GroupListView(APIView):
         page_size = request.GET.get('pageSize', None)
 
         if page_size is None:
-            page_size = 10
+            serializer = self.serializer_for_group(group_obj, many=True)
+        else:
+            paginator = Paginator(group_obj, page_size)
+            try:
+                page_obj = paginator.get_page(page)
+            except PageNotAnInteger:
+                page_obj = paginator.page(1)
+            except EmptyPage:
+                page_obj = paginator.page(paginator.num_pages)
 
-        paginator = Paginator(group_obj, page_size)
-
-        try:
-            page_obj = paginator.get_page(page)
-        except PageNotAnInteger:
-            page_obj = paginator.page(1)
-        except EmptyPage:
-            page_obj = paginator.page(paginator.num_pages)
-
-        serializer = self.serializer_for_group(page_obj, many=True)
+            serializer = self.serializer_for_group(page_obj, many=True)
 
         return JsonResponse({
             "groups": serializer.data,
@@ -112,7 +152,7 @@ class GroupCreateView(APIView):
             }
         except Group.DoesNotExist:
             form = self.form_class(body)
-            if form.is_valid:
+            if form.is_valid():
                 todo = form.save(commit=False)
                 todo.save()
                 form.save_m2m()
@@ -218,7 +258,6 @@ class GroupSearchView(APIView):
 
     def get(self, request):
         search_string = request.GET.get('q', None)
-        print(search_string)
         if search_string:
             groups = self.model.objects.filter(
                 Q(name=search_string)).order_by('id')
