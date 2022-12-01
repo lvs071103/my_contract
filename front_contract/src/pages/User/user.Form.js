@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Form, Button, Select, Input, Checkbox, DatePicker } from 'antd'
 import { http } from '@/utils'
 import Swal from 'sweetalert2'
@@ -11,7 +11,7 @@ export default function UserForm (props) {
   const permsOptions = []
   const groupOptions = []
 
-  const { permissions, groups, handleOk } = props
+  const { permissions, groups, handleOk, row, title } = props
 
   // 获取权限列表
   permissions.map((element) => {
@@ -26,8 +26,16 @@ export default function UserForm (props) {
 
   const formRef = React.createRef()
 
-  const [checked, setChecked] = useState(false)
+  const [superuserchecked, setSuperuserChecked] = useState('')
+  const [staffchecked, setStaffChecked] = useState('')
+  const [activechecked, setActiveChecked] = useState('')
 
+
+  const initialValuesObj = {
+    is_active: row.is_active,
+    is_staff: row.is_staff,
+    is_superuser: row.is_superuser
+  }
 
   const config = {
     rules: [
@@ -39,14 +47,12 @@ export default function UserForm (props) {
     ],
   }
 
-
   const onFinish = async (values) => {
     // 提交数据
     // console.log(values)
     const response = await http.post('/accounts/user/add', {
       username: values.username,
       password: values.password,
-      password2: values.password2,
       is_superuser: values.is_superuser,
       groups: values.groups,
       permissions: values.permissions,
@@ -111,6 +117,23 @@ export default function UserForm (props) {
   }
 
 
+  // 当记录发生变化时，为form设置初始值
+  useEffect(() => {
+    formRef.current.setFieldsValue({
+      username: row.username,
+      password: row.password,
+      permissions: row.permissions,
+      groups: row.groups,
+      last_name: row.last_name,
+      first_name: row.first_name,
+      email: row.email,
+    })
+    row.is_staff = true ? setStaffChecked("checked") : setStaffChecked('')
+    row.is_superuser = true ? setSuperuserChecked("checked") : setSuperuserChecked('')
+    row.is_active = true ? setActiveChecked("checked") : setActiveChecked('')
+    // eslint-disable-next-line
+  }, [row])
+
   const layout = {
     labelCol: {
       span: 5,
@@ -132,6 +155,8 @@ export default function UserForm (props) {
       ref={formRef}
       name="control-ref"
       onFinish={onFinish}
+      initialValues={title === '编辑' ? initialValuesObj : {}}
+      autoComplete="off"
     >
       <Form.Item
         name="username"
@@ -158,24 +183,7 @@ export default function UserForm (props) {
           },
         ]}
       >
-        <Input.Password />
-      </Form.Item>
-
-      <Form.Item
-        name="password2"
-        label="确认密码"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your password!'
-          },
-          {
-            min: 6,
-            message: 'Password  must be minimum 6 characters.'
-          },
-        ]}
-      >
-        <Input.Password />
+        <Input.Password autoComplete='off' />
       </Form.Item>
 
       <Form.Item
@@ -193,24 +201,24 @@ export default function UserForm (props) {
       <Form.Item
         name="is_superuser"
         label="管理员"
-        valuePropName={checked}
+        valuePropName={superuserchecked}
       >
-        <Checkbox onChange={(e) => { setChecked('checked') }}></Checkbox>
+        <Checkbox onChange={(e) => { setSuperuserChecked('checked') }}></Checkbox>
       </Form.Item>
 
       <Form.Item
         name="is_staff"
         label="员工"
-        valuePropName={checked}
+        valuePropName={staffchecked}
       >
-        <Checkbox onChange={(e) => { setChecked('checked') }}></Checkbox>
+        <Checkbox onChange={(e) => { setStaffChecked('checked') }}></Checkbox>
       </Form.Item>
       <Form.Item
         name="is_active"
         label="激活"
-        valuePropName={checked}
+        valuePropName={activechecked}
       >
-        <Checkbox onChange={(e) => { setChecked('checked') }}></Checkbox>
+        <Checkbox onChange={(e) => { setActiveChecked('checked') }}></Checkbox>
       </Form.Item>
 
       <Form.Item
@@ -258,6 +266,6 @@ export default function UserForm (props) {
           Reset
         </Button>
       </Form.Item>
-    </Form>
+    </Form >
   )
 }

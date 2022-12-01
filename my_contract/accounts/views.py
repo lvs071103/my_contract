@@ -101,6 +101,35 @@ class UserCreateView(APIView):
         return JsonResponse(data)
 
 
+class UserUpdateView(APIView):
+    my_module = User
+    form_class = UserForm
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        return JsonResponse({
+            "message":
+            "this is only {} request".format(str(request.method).lower()),
+        })
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class()
+        data = {}
+        group_obj = self.my_module.objects.get(pk=kwargs['pk'])
+        body = json.loads(request.body.decode('utf-8'))
+        form = self.form_class(data=body, instance=group_obj)
+        if form.is_valid():
+            form.save()
+            data['success'] = True
+            data['message'] = 'update!'
+        else:
+            for field, errors in form.errors.items():
+                error = 'Field: {} Errors: {}'.format(field, ','.join(errors))
+                data = {'success': False, 'message': error}
+
+        return JsonResponse(data)
+
+
 class UserDeleteView(APIView):
     model = User
     permission_classes = (IsAuthenticated, )

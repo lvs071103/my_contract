@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Tag, Input, Modal } from 'antd'
 import 'moment/locale/zh-cn'
 import './index.scss'
@@ -28,6 +28,7 @@ const User = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [title, setTitle] = useState('')
+  const [row, setRow] = useState({})
   const { permsStore, groupStore } = useStore()
 
   // 如果异步请求函数需要依赖一些数据的变化而重新执行
@@ -56,7 +57,6 @@ const User = () => {
     setIsModalOpen(true)
   }
 
-
   // 切换当前页触发
   const pageChange = (page, newPageSize) => {
     setParams({
@@ -78,9 +78,10 @@ const User = () => {
   }
 
   // 编辑
-  const navigate = useNavigate()
-  const goPublish = (data) => {
-    navigate(`/publish?id=${data.id}`)
+  const goUpdate = (data) => {
+    setTitle('编辑')
+    setIsModalOpen(true)
+    setRow(data)
   }
 
   const handleOk = async () => {
@@ -157,7 +158,7 @@ const User = () => {
               type="primary"
               shape="circle"
               icon={<EditOutlined />}
-              onClick={() => goPublish(data)}
+              onClick={() => goUpdate(data)}
             />
             <Popconfirm
               title="确认删除该条文章吗?"
@@ -218,6 +219,8 @@ const User = () => {
             permissions={permsStore.permsList}
             groups={groupStore.groupList}
             handleOk={handleOk}
+            title={title}
+            row={title === '编辑' ? row : null}
           />
         </Modal>
         <Table
