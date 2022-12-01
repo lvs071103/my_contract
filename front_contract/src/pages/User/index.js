@@ -5,7 +5,7 @@ import 'moment/locale/zh-cn'
 import './index.scss'
 import { http } from '@/utils'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
-import { observer } from 'mobx-react-lite'
+// import { observer } from 'mobx-react-lite'
 import { useStore } from '@/store'
 import UserForm from './user.Form'
 
@@ -58,21 +58,22 @@ const User = () => {
 
 
   // 切换当前页触发
-  const pageChange = (page) => {
+  const pageChange = (page, newPageSize) => {
     setParams({
       ...params,
-      page
+      page: params.pageSize !== newPageSize ? 1 : page,
+      pageSize: newPageSize
     })
   }
 
   // 删除
-  const delArticle = async (data) => {
+  const delUser = async (data, page) => {
     // console.log(data)
-    await http.delete(`/mp/articles/${data.id}`)
+    await http.delete(`accounts/user/delete/${data.id}`)
     // 刷新一下列表
     setParams({
       ...params,
-      page: 1
+      page
     })
   }
 
@@ -85,6 +86,14 @@ const User = () => {
   const handleOk = async () => {
     // 关闭弹窗，并更新users
     setIsModalOpen(false)
+    const res = await http.get('accounts/user/list', { params })
+    const { data, count } = res.data
+    setUsers(
+      {
+        list: data,
+        count: count
+      }
+    )
   }
 
   const handleCancel = () => {
@@ -115,12 +124,29 @@ const User = () => {
     {
       title: '管理员',
       dataIndex: 'is_superuser',
-      render: data => <Tag color="green">是</Tag>
+      render: (text, _) => {
+        return `${text}` === 'true' ?
+          <Tag color="green">是</Tag> :
+          <Tag color="yellow">否</Tag>
+      }
+    },
+    {
+      title: '员工',
+      dataIndex: 'is_staff',
+      render: (text, _) => {
+        return `${text}` === 'true' ?
+          <Tag color="green">是</Tag> :
+          <Tag color="yellow">否</Tag>
+      }
     },
     {
       title: '状态',
       dataIndex: 'is_active',
-      render: data => <Tag color="green">激活</Tag>
+      render: (text, _) => {
+        return `${text}` === 'true' ?
+          <Tag color="green">激活</Tag> :
+          <Tag color="yellow">未激活</Tag>
+      }
     },
     {
       title: '操作',
@@ -135,7 +161,7 @@ const User = () => {
             />
             <Popconfirm
               title="确认删除该条文章吗?"
-              onConfirm={() => delArticle(data)}
+              onConfirm={() => delUser(data, params.page)}
               okText="确认"
               cancelText="取消"
             >
@@ -144,7 +170,6 @@ const User = () => {
                 danger
                 shape="circle"
                 icon={<DeleteOutlined />}
-              // onClick={() => delArticle(data)}
               />
             </Popconfirm>
 
@@ -201,6 +226,7 @@ const User = () => {
           dataSource={users.list}
           pagination={
             {
+              defaultCurrent: params.page,
               pageSize: params.pageSize,
               total: users.count,
               onChange: pageChange
@@ -213,4 +239,5 @@ const User = () => {
   )
 }
 
-export default observer(User)
+// export default observer(User)
+export default User

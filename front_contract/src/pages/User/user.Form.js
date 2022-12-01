@@ -4,6 +4,7 @@ import { http } from '@/utils'
 import Swal from 'sweetalert2'
 import 'moment/locale/zh-cn'
 import locale from 'antd/es/date-picker/locale/zh_CN'
+// import moment from 'moment-timezone'
 
 
 export default function UserForm (props) {
@@ -25,7 +26,7 @@ export default function UserForm (props) {
 
   const formRef = React.createRef()
 
-  const [checked, setChecked] = useState('')
+  const [checked, setChecked] = useState(false)
 
 
   const config = {
@@ -40,10 +41,12 @@ export default function UserForm (props) {
 
 
   const onFinish = async (values) => {
-    console.log(values['date_joined'].format('YYYY-MM-DD HH:mm:ss'))
+    // 提交数据
+    // console.log(values)
     const response = await http.post('/accounts/user/add', {
       username: values.username,
       password: values.password,
+      password2: values.password2,
       is_superuser: values.is_superuser,
       groups: values.groups,
       permissions: values.permissions,
@@ -51,7 +54,8 @@ export default function UserForm (props) {
       is_active: values.is_active,
       last_name: values.last_name,
       first_name: values.first_name,
-      date_joined: values['date_joined'].format('YYYY-MM-DD HH:mm:ss')
+      date_joined: values['date_joined'].format('YYYY-MM-DD HH:mm:ss'),
+      email: values.email
     })
 
     if (response.data.success === true) {
@@ -75,7 +79,7 @@ export default function UserForm (props) {
   const [value, setValue] = React.useState([])
 
   const onReset = () => {
-    this.formRef.current.resetFields()
+    formRef.current.resetFields()
   }
 
   const permsSelectProps = {
@@ -156,6 +160,24 @@ export default function UserForm (props) {
       >
         <Input.Password />
       </Form.Item>
+
+      <Form.Item
+        name="password2"
+        label="确认密码"
+        rules={[
+          {
+            required: true,
+            message: 'Please input your password!'
+          },
+          {
+            min: 6,
+            message: 'Password  must be minimum 6 characters.'
+          },
+        ]}
+      >
+        <Input.Password />
+      </Form.Item>
+
       <Form.Item
         name="permissions"
         label="权限"
@@ -195,7 +217,11 @@ export default function UserForm (props) {
         name="date_joined"
         label="加入时间" {...config}
       >
-        <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" locale={locale} />
+        <DatePicker
+          showTime
+          format="YYYY-MM-DD HH:mm:ss"
+          locale={locale}
+        />
       </Form.Item>
 
       <Form.Item

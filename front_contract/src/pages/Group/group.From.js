@@ -72,7 +72,7 @@ const GroupForm = (props) => {
 
   // 重置form表单
   const onReset = () => {
-    this.formRef.current.resetFields()
+    formRef.current.resetFields()
   }
 
   return (

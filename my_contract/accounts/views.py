@@ -8,8 +8,12 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from accounts.serializers import GroupSerializer, PermissionSerializer, UserSerializer
 from django.db.models import Q
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.hashers import make_password
+from django.utils.timezone import make_aware
+from my_contract.settings import TIME_ZONE
 # from rest_framework.decorators import api_view
 import json
+import datetime
 # Create your views here.
 
 
@@ -39,18 +43,18 @@ class UserListView(APIView):
         page_size = request.GET.get('pageSize', None)
 
         if page_size is None:
-            page_size = 10
+            user_serializers = self.serializer_class(users, many=True)
+        else:
+            paginator = Paginator(users, page_size)
 
-        paginator = Paginator(users, page_size)
+            try:
+                page_obj = paginator.get_page(page)
+            except PageNotAnInteger:
+                page_obj = paginator.page(1)
+            except EmptyPage:
+                page_obj = paginator.page(paginator.num_pages)
 
-        try:
-            page_obj = paginator.get_page(page)
-        except PageNotAnInteger:
-            page_obj = paginator.page(1)
-        except EmptyPage:
-            page_obj = paginator.page(paginator.num_pages)
-
-        user_serializers = self.serializer_class(page_obj, many=True)
+            user_serializers = self.serializer_class(page_obj, many=True)
 
         return JsonResponse({
             "data": user_serializers.data,
@@ -66,7 +70,7 @@ class UserCreateView(APIView):
     class_form = UserForm
 
     def get(self, request):
-        form = UserCreationForm()
+        # form = UserCreationForm()
         return JsonResponse({
             "message":
             "this is only {} request".format(str(request.method).lower()),
@@ -75,20 +79,18 @@ class UserCreateView(APIView):
     def post(self, request):
         data = {}
         body = json.loads(request.body.decode('utf-8'))
-        # try:
-        #     self.model.objects.get(username=body['username'])
-        #     data = {
-        #         'success': False,
-        #         'message': '{} is exist!'.format(body['username']),
-        #     }
-        # except self.model.DoesNotExist:
+        # print(body)
+        naive_datetimer = datetime.datetime.strptime(body['date_joined'],
+                                                     '%Y-%m-%d %H:%M:%S')
+        TIME_ZONE
+        aware_datetimer = make_aware(naive_datetimer)
+        body['password'] = make_password(body['password'])
+        body['date_joined'] = aware_datetimer
         form = self.class_form(body)
         if form.is_valid():
-            print(body)
-            form.save()
-            # user = form.save(commit=True)
-            # user.save()
-            # form.save_m2m()
+            new_user = form.save(commit=False)
+            new_user.save()
+            form.save_m2m()
             data['success'] = True
             data['message'] = 'saved'
         else:
@@ -97,6 +99,42 @@ class UserCreateView(APIView):
                 data = {'success': False, 'message': error}
 
         return JsonResponse(data)
+
+
+class UserDeleteView(APIView):
+    model = User
+    permission_classes = (IsAuthenticated, )
+    http_method_names = ['get', 'post', 'delete']
+
+    def dispatch(self, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'get':
+            return self.get(*args, **kwargs)
+        if method == 'delete':
+            return self.delete(*args, **kwargs)
+        if method == 'post':
+            return self.post(*args, **kwargs)
+        return super(UserDeleteView, self).dispatch(*args, **kwargs)
+
+    def get(self, request):
+        return JsonResponse({
+            "message":
+            "this is only {} request".format(str(request.method).lower()),
+        })
+
+    def delete(self, *args, **kwargs):
+        try:
+            get_object_or_404(self.model, pk=kwargs['pk']).delete()
+        except self.model.DoesNotExist:
+            raise Http404
+        return JsonResponse({'success': True, 'message': 'deleted!'})
+
+    def post(self, *args, **kwargs):
+        try:
+            get_object_or_404(self.model, pk=kwargs['pk']).delete()
+        except self.model.DoesNotExist:
+            raise Http404
+        return JsonResponse({'success': True, 'message': 'deleted!'})
 
 
 class GroupListView(APIView):

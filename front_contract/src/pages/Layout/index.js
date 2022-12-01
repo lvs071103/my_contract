@@ -9,7 +9,7 @@ import './index.scss'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useStore } from '@/store'
 import React, { useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
+// import { observer } from 'mobx-react-lite'
 
 const { Header, Sider } = Layout
 
@@ -102,5 +102,5 @@ const GeekLayout = () => {
   )
 }
 
-export default observer(GeekLayout)
-// export default GeekLayout
+// export default observer(GeekLayout)
+export default GeekLayout

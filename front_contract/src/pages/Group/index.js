@@ -3,7 +3,7 @@ import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Input, Modal } from
 import { Link } from 'react-router-dom'
 import { http } from '@/utils'
 import { EditOutlined, DeleteOutlined, UnorderedListOutlined } from '@ant-design/icons'
-import { observer } from 'mobx-react-lite'
+// import { observer } from 'mobx-react-lite'
 import './index.scss'
 import GroupForm from './group.From'
 import GroupEdit from './group.Edit'
@@ -278,4 +278,5 @@ const Group = () => {
   )
 }
 
-export default observer(Group)
+// export default observer(Group)
+export default Group
