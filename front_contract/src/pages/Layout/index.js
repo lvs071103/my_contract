@@ -9,7 +9,6 @@ import './index.scss'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useStore } from '@/store'
 import React, { useEffect } from 'react'
-import { useState } from 'react'
 // import { observer } from 'mobx-react-lite'
 
 const { Header, Sider } = Layout
@@ -17,9 +16,8 @@ const { Header, Sider } = Layout
 const GeekLayout = () => {
 
   const { pathname } = useLocation()
-  const [openKey, setOpenKey] = useState('/')
-
-  // const [collapsed, setCollapsed] = useState(false)
+  // const [openKey, setOpenKey] = useState('/')
+  // const [collapsed, setCollapsed] = useState(true)
   // pathname：url中的子路径
 
   const { userStore, loginStore, permsStore, groupStore } = useStore()
@@ -30,24 +28,8 @@ const GeekLayout = () => {
       permsStore.loadPermslList()
       groupStore.loadGroupList()
     } catch { }
+    // getSubMenu()
   }, [userStore, permsStore, groupStore])
-
-
-  useEffect(() => {
-    const getMenu = () => {
-      items.map(parent_menu => {
-        if (parent_menu.children) {
-          parent_menu.children.map((item) => {
-            if (item.key === pathname) {
-              setOpenKey(parent_menu.key)
-            }
-          })
-        }
-      })
-    }
-    getMenu()
-  }, [pathname])
-
 
   const items = [
     getItem(<Link to={'/'}>数据概览</Link>, '/', <DashboardFilled />),
@@ -80,8 +62,6 @@ const GeekLayout = () => {
     navigate('/login/')
   }
 
-  console.log(openKey)
-
   return (
     <Layout>
       <Header className="header">
@@ -104,12 +84,28 @@ const GeekLayout = () => {
           <Menu
             mode="inline"
             theme="dark"
-            defaultSelectedKeys={[openKey, pathname]}
+            defaultSelectedKeys={[pathname]}
             // 高亮原理： selectedKeys === item key
             selectedKeys={[pathname]}
             style={{ height: '100%', borderRight: 0 }}
             // inlineCollapsed={collapsed}
-            defaultOpenKeys={[openKey]}
+            defaultOpenKeys={() => {
+              const list = []
+              items.map((item) => {
+                if (item.children) {
+                  item.children.map((s) => {
+                    if (s.key === pathname) {
+                      list.push(item.key)
+                    }
+                    return {}
+                  })
+                }
+                return {}
+              })
+              console.log(list)
+              return list
+            }
+            }
             items={items}
           >
           </Menu>
@@ -119,7 +115,7 @@ const GeekLayout = () => {
           <Outlet />
         </Layout>
       </Layout>
-    </Layout>
+    </Layout >
   )
 }
 

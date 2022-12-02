@@ -28,7 +28,12 @@ export default function Bar ({ title, xData, yData, style }) {
     })
   }
 
-  useEffect(() => { chartInit() }, [])
+  useEffect(() => {
+    chartInit()
+  },
+    // eslint-disable-next-line
+    []
+  )
 
   return (
     <div>

@@ -140,10 +140,9 @@ export default function UserForm (props) {
     if (id) {
       loadDetail()
     } else {
-      onReset()
+      formRef.current.resetFields()
     }
-  }, [id])
-
+  }, [id, formRef])
 
   const layout = {
     labelCol: {
