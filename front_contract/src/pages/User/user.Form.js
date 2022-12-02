@@ -4,14 +4,22 @@ import { http } from '@/utils'
 import Swal from 'sweetalert2'
 import 'moment/locale/zh-cn'
 import locale from 'antd/es/date-picker/locale/zh_CN'
-// import moment from 'moment-timezone'
+import { useStore } from '@/store'
+import moment from "moment"
 
 
 export default function UserForm (props) {
+
+  const formRef = React.createRef()
   const permsOptions = []
   const groupOptions = []
 
-  const { permissions, groups, handleOk, row, title } = props
+  const { handleOk, id } = props
+
+  // 读取useStore数据
+  const { permsStore, groupStore } = useStore()
+  const permissions = permsStore.permsList
+  const groups = groupStore.groupList
 
   // 获取权限列表
   permissions.map((element) => {
@@ -23,19 +31,11 @@ export default function UserForm (props) {
     return groupOptions.push({ label: `Label: ${element.name}`, value: element.id })
   })
 
+  const [superuserchecked, setSuperuserChecked] = useState(null)
+  const [staffchecked, setStaffChecked] = useState(null)
+  const [activechecked, setActiveChecked] = useState(null)
+  const submitURL = id ? `/accounts/user/edit/${id}` : '/accounts/user/add'
 
-  const formRef = React.createRef()
-
-  const [superuserchecked, setSuperuserChecked] = useState('')
-  const [staffchecked, setStaffChecked] = useState('')
-  const [activechecked, setActiveChecked] = useState('')
-
-
-  const initialValuesObj = {
-    is_active: row.is_active,
-    is_staff: row.is_staff,
-    is_superuser: row.is_superuser
-  }
 
   const config = {
     rules: [
@@ -50,20 +50,20 @@ export default function UserForm (props) {
   const onFinish = async (values) => {
     // 提交数据
     // console.log(values)
-    const response = await http.post('/accounts/user/add', {
+    const request_params = {
       username: values.username,
       password: values.password,
       is_superuser: values.is_superuser,
       groups: values.groups,
-      permissions: values.permissions,
+      user_permissions: values.user_permissions,
       is_staff: values.is_staff,
       is_active: values.is_active,
       last_name: values.last_name,
       first_name: values.first_name,
       date_joined: values['date_joined'].format('YYYY-MM-DD HH:mm:ss'),
       email: values.email
-    })
-
+    }
+    const response = await http.post(submitURL, { request_params })
     if (response.data.success === true) {
       Swal.fire({
         icon: 'success',
@@ -117,22 +117,33 @@ export default function UserForm (props) {
   }
 
 
-  // 当记录发生变化时，为form设置初始值
+  // 编辑
+  // 数据回填, id调用接口，1.表单回填 2.暂存列表
   useEffect(() => {
-    formRef.current.setFieldsValue({
-      username: row.username,
-      password: row.password,
-      permissions: row.permissions,
-      groups: row.groups,
-      last_name: row.last_name,
-      first_name: row.first_name,
-      email: row.email,
-    })
-    row.is_staff = true ? setStaffChecked("checked") : setStaffChecked('')
-    row.is_superuser = true ? setSuperuserChecked("checked") : setSuperuserChecked('')
-    row.is_active = true ? setActiveChecked("checked") : setActiveChecked('')
-    // eslint-disable-next-line
-  }, [row])
+    const loadDetail = async () => {
+      const res = await http.get(`accounts/user/detail/${id}`)
+      const userObj = res.data.user_obj
+      formRef.current.setFieldsValue({
+        username: userObj.username,
+        password: userObj.password,
+        user_permissions: userObj.user_permissions,
+        groups: userObj.groups,
+        is_superuser: userObj.is_superuser,
+        is_active: userObj.is_active,
+        is_staff: userObj.is_staff,
+        first_name: userObj.first_name,
+        last_name: userObj.last_name,
+        email: userObj.email,
+        date_joined: moment(userObj.date_joined)
+      })
+    }
+    if (id) {
+      loadDetail()
+    } else {
+      onReset()
+    }
+  }, [id])
+
 
   const layout = {
     labelCol: {
@@ -155,7 +166,6 @@ export default function UserForm (props) {
       ref={formRef}
       name="control-ref"
       onFinish={onFinish}
-      initialValues={title === '编辑' ? initialValuesObj : {}}
       autoComplete="off"
     >
       <Form.Item
@@ -183,11 +193,11 @@ export default function UserForm (props) {
           },
         ]}
       >
-        <Input.Password autoComplete='off' />
+        <Input.Password />
       </Form.Item>
 
       <Form.Item
-        name="permissions"
+        name="user_permissions"
         label="权限"
       >
         <Select  {...permsSelectProps} />
@@ -201,7 +211,7 @@ export default function UserForm (props) {
       <Form.Item
         name="is_superuser"
         label="管理员"
-        valuePropName={superuserchecked}
+        valuePropName={id ? 'checked' : superuserchecked}
       >
         <Checkbox onChange={(e) => { setSuperuserChecked('checked') }}></Checkbox>
       </Form.Item>
@@ -209,14 +219,14 @@ export default function UserForm (props) {
       <Form.Item
         name="is_staff"
         label="员工"
-        valuePropName={staffchecked}
+        valuePropName={id ? "checked" : staffchecked}
       >
         <Checkbox onChange={(e) => { setStaffChecked('checked') }}></Checkbox>
       </Form.Item>
       <Form.Item
         name="is_active"
         label="激活"
-        valuePropName={activechecked}
+        valuePropName={id ? "checked" : activechecked}
       >
         <Checkbox onChange={(e) => { setActiveChecked('checked') }}></Checkbox>
       </Form.Item>

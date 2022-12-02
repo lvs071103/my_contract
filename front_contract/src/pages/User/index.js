@@ -6,7 +6,6 @@ import './index.scss'
 import { http } from '@/utils'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 // import { observer } from 'mobx-react-lite'
-import { useStore } from '@/store'
 import UserForm from './user.Form'
 
 
@@ -29,7 +28,6 @@ const User = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [title, setTitle] = useState('')
   const [row, setRow] = useState({})
-  const { permsStore, groupStore } = useStore()
 
   // 如果异步请求函数需要依赖一些数据的变化而重新执行
   // 推荐把它写在内部
@@ -216,15 +214,12 @@ const User = () => {
           centered
         >
           <UserForm
-            permissions={permsStore.permsList}
-            groups={groupStore.groupList}
             handleOk={handleOk}
-            title={title}
-            row={title === '编辑' ? row : null}
+            id={title === '编辑' ? row.id : null}
           />
         </Modal>
         <Table
-          rowKey="id"
+          rowKey={row => (row.id)}
           columns={columns}
           dataSource={users.list}
           pagination={

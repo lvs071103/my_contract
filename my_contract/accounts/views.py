@@ -78,7 +78,7 @@ class UserCreateView(APIView):
 
     def post(self, request):
         data = {}
-        body = json.loads(request.body.decode('utf-8'))
+        body = json.loads(request.body.decode('utf-8'))['request_params']
         # print(body)
         naive_datetimer = datetime.datetime.strptime(body['date_joined'],
                                                      '%Y-%m-%d %H:%M:%S')
@@ -116,7 +116,8 @@ class UserUpdateView(APIView):
         form = self.form_class()
         data = {}
         group_obj = self.my_module.objects.get(pk=kwargs['pk'])
-        body = json.loads(request.body.decode('utf-8'))
+        body = json.loads(request.body.decode('utf-8'))['request_params']
+        body.update({'password': make_password(body['password'])})
         form = self.form_class(data=body, instance=group_obj)
         if form.is_valid():
             form.save()
@@ -164,6 +165,25 @@ class UserDeleteView(APIView):
         except self.model.DoesNotExist:
             raise Http404
         return JsonResponse({'success': True, 'message': 'deleted!'})
+
+
+class UserDetailView(APIView):
+    permission_classes = (IsAuthenticated, )
+    serializers_class = UserSerializer
+    model = User
+
+    def get(self, request, pk):
+        try:
+            users = self.model.objects.get(pk=pk)
+        except self.model.DoesNotExist:
+            raise Http404
+
+        user_serializers = self.serializers_class(users)
+
+        return JsonResponse({
+            "user_obj": user_serializers.data,
+            'success': True,
+        })
 
 
 class GroupListView(APIView):
