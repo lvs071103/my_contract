@@ -102,7 +102,6 @@ const GeekLayout = () => {
                 }
                 return {}
               })
-              console.log(list)
               return list
             }
             }

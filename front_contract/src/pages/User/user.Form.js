@@ -140,9 +140,11 @@ export default function UserForm (props) {
     if (id) {
       loadDetail()
     } else {
-      formRef.current.resetFields()
+      onReset()
     }
-  }, [id, formRef])
+  },// eslint-disable-next-line 
+    [id]
+  )
 
   const layout = {
     labelCol: {
