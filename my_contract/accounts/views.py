@@ -349,6 +349,9 @@ class GroupSearchView(APIView):
             groups = self.model.objects.filter(
                 Q(name=search_string)).order_by('id')
             count = self.model.objects.filter(Q(name=search_string)).count()
+        else:
+            groups = []
+            count = 0
 
         page = request.GET.get('page', 1)
         page_size = request.GET.get('pageSize', None)
