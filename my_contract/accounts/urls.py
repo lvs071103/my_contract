@@ -17,6 +17,8 @@ urlpatterns = [
     re_path(r'user/detail/(?P<pk>\d+)$',
             views.UserDetailView.as_view(),
             name='user_detail'),
+    path('user/search/', views.UserSearchView.as_view(), name='user_detail'),
+    # group
     path('group/list', views.GroupListView.as_view(), name='group_list'),
     path('group/add', views.GroupCreateView.as_view(), name='group_add'),
     re_path(r'group/delete/(?P<pk>\d+)$',

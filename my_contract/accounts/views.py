@@ -186,6 +186,46 @@ class UserDetailView(APIView):
         })
 
 
+class UserSearchView(APIView):
+    permission_classes = (IsAuthenticated, )
+    user_serializers = UserSerializer
+    model = User
+
+    def get(self, request):
+        search_string = request.GET.get('q', None)
+        if search_string:
+            users = self.model.objects.filter(
+                Q(username=search_string)).order_by('id')
+            count = self.model.objects.filter(
+                Q(username=search_string)).count()
+        else:
+            users = []
+            count = 0
+
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('pageSize', None)
+
+        if page_size is None:
+            page_size = 10
+
+        paginator = Paginator(users, page_size)
+
+        try:
+            page_obj = paginator.get_page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        sa = self.user_serializers(users, many=True)
+
+        return JsonResponse({
+            "users": sa.data,
+            "count": count,
+            'success': True,
+        })
+
+
 class GroupListView(APIView):
     permission_classes = (IsAuthenticated, )
     # 数据序列化

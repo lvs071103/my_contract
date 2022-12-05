@@ -4,7 +4,7 @@ import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Tag, Input, Modal }
 import 'moment/locale/zh-cn'
 import './index.scss'
 import { http } from '@/utils'
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { EditOutlined, DeleteOutlined, UnorderedListOutlined } from '@ant-design/icons'
 // import { observer } from 'mobx-react-lite'
 import UserForm from './user.Form'
 
@@ -82,6 +82,13 @@ const User = () => {
     setRow(data)
   }
 
+  //弹出详情窗口
+  const showDetailModal = (data) => {
+    setTitle('详情')
+    setIsModalOpen(true)
+    setRow(data)
+  }
+
   const handleOk = async () => {
     // 关闭弹窗，并更新users
     setIsModalOpen(false)
@@ -97,6 +104,16 @@ const User = () => {
 
   const handleCancel = () => {
     setIsModalOpen(false)
+  }
+
+  // 搜索
+  const onSearch = async (data) => {
+    const res = await http.get(`accounts/user/search/?q=${data}`)
+    console.log(res)
+    setUsers({
+      list: res.data.users,
+      count: res.count
+    })
   }
 
   const columns = [
@@ -171,7 +188,13 @@ const User = () => {
                 icon={<DeleteOutlined />}
               />
             </Popconfirm>
-
+            <Button
+              type="primary"
+              ghost
+              shape="circle"
+              icon={<UnorderedListOutlined />}
+              onClick={() => { showDetailModal(data) }}
+            />
           </Space>
         )
       }
@@ -199,11 +222,8 @@ const User = () => {
         }
 
         extra={
-          <Search placeholder="input search text" onSearch='' enterButton />
+          <Search placeholder="input search text" onSearch={onSearch} enterButton />
         }
-        style={{
-
-        }}
       >
         <Modal
           title={title}
@@ -215,7 +235,8 @@ const User = () => {
         >
           <UserForm
             handleOk={handleOk}
-            id={title === '编辑' ? row.id : null}
+            title={title}
+            id={title === '编辑' || title === '详情' ? row.id : null}
           />
         </Modal>
         <Table

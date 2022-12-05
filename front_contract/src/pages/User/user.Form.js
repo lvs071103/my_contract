@@ -14,7 +14,7 @@ export default function UserForm (props) {
   const permsOptions = []
   const groupOptions = []
 
-  const { handleOk, id } = props
+  const { handleOk, id, title } = props
 
   // 读取useStore数据
   const { permsStore, groupStore } = useStore()
@@ -133,6 +133,7 @@ export default function UserForm (props) {
         is_staff: userObj.is_staff,
         first_name: userObj.first_name,
         last_name: userObj.last_name,
+        last_login: moment(userObj.last_login),
         email: userObj.email,
         date_joined: moment(userObj.date_joined)
       })
@@ -243,6 +244,18 @@ export default function UserForm (props) {
         />
       </Form.Item>
 
+      {title === '详情' ?
+        <Form.Item
+          name="last_login"
+          label="最近登陆"
+        >
+          <DatePicker
+            showTime
+            format="YYYY-MM-DD HH:mm:ss"
+            locale={locale}
+          />
+        </Form.Item> : null}
+
       <Form.Item
         name="first_name"
         label="名"
@@ -269,14 +282,15 @@ export default function UserForm (props) {
         <Input />
       </Form.Item>
 
-      <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-        <Button htmlType="button" onClick={onReset}>
-          Reset
-        </Button>
-      </Form.Item>
+      {title !== '详情' ?
+        <Form.Item {...tailLayout}>
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+          <Button htmlType="button" onClick={onReset}>
+            Reset
+          </Button>
+        </Form.Item> : null}
     </Form >
   )
 }

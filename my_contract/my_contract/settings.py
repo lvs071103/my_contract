@@ -149,4 +149,5 @@ AUTH_PROFILE_MODULE = 'accounts.Profile'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
+    'UPDATE_LAST_LOGIN': True,
 }
