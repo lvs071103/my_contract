@@ -40,8 +40,9 @@ const GeekLayout = () => {
       ]),
     getItem('合同管理', 'sub2', <EditOutlined />,
       [
-        // getItem(<Link to={'/provider'}>供应商</Link>, '/provider'),
-        getItem(<Link to={'/contract'}>合同管理</Link>, '/contract'),
+        getItem(<Link to={'/contract/supplier/list'}>供应商</Link>, '/contract/supplier/list'),
+        getItem(<Link to={'/contract/contract/list'}>合同列表</Link>, '/contract/contract/list'),
+        getItem(<Link to={'/contract/contract/add'}>合同提交</Link>, '/contract/contract/add'),
       ]),
   ]
 

@@ -11,6 +11,8 @@ const Home = lazy(() => import('@/pages/Home'))
 const User = lazy(() => import('@/pages/User'))
 const Group = lazy(() => import('@/pages/Group'))
 const Contract = lazy(() => import('@/pages/Contract'))
+const Supplier = lazy(() => import('@/pages/Suppliers'))
+const SubmitForm = lazy(() => import('@/pages/Submit'))
 
 export default class App extends Component {
   render () {
@@ -41,9 +43,9 @@ export default class App extends Component {
               {/* <Route path='/accounts' element={<User />}> */}
               <Route path='/accounts/user/list' element={<User />}></Route>
               <Route path='/accounts/group/list' element={<Group />}></Route>
-              {/* </Route> */}
-              {/* <Route path='/test/' element={<UseEffectTest name='Jack.Z' />}></Route> */}
-              <Route path='/contract/' element={<Contract />}></Route>
+              <Route path='/contract/contract/list' element={<Contract />}></Route>
+              <Route path='/contract/supplier/list' element={<Supplier />}></Route>
+              <Route path='/contract/contract/add' element={<SubmitForm />}></Route>
             </Route>
             <Route path='/login/' element={<Login />}></Route>
           </Routes>
