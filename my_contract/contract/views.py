@@ -3,9 +3,11 @@ from rest_framework.permissions import IsAuthenticated
 from contract.serializers import SupplierSerializer
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from contract.models import Supplier
+from contract.forms import SupplierForm
 from django.http import JsonResponse, Http404
 from django.core import serializers
 from django.http import HttpResponse
+import json
 
 
 class SupplierListView(APIView):
@@ -14,7 +16,7 @@ class SupplierListView(APIView):
     serializer_class = SupplierSerializer
 
     def get(self, request):
-        supplier_obj = Supplier.objects.all()
+        supplier_obj = Supplier.objects.get_queryset().order_by('id')
         page = request.GET.get('page', 1)
         page_size = request.GET.get('pageSize', None)
 
@@ -38,3 +40,18 @@ class SupplierListView(APIView):
             "count": len(supplier_obj),
             'success': True
         })
+
+
+class SupplierCreateView(APIView):
+    permission_classes = (IsAuthenticated, )
+    model = Supplier
+    form_class = SupplierForm
+
+    def get(self, request):
+        return JsonResponse({
+            "message":
+            "this is only {} request".format(str(request.method).lower()),
+        })
+
+    def post(self, request):
+        body = json.loads(request.body.decode('utf-8'))['request_params']
