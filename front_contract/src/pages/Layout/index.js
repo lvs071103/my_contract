@@ -20,16 +20,17 @@ const GeekLayout = () => {
   // const [collapsed, setCollapsed] = useState(true)
   // pathname：url中的子路径
 
-  const { userStore, loginStore, permsStore, groupStore } = useStore()
+  const { userStore, loginStore, permsStore, groupStore, typesStore } = useStore()
   // 获取用户数据
   useEffect(() => {
     try {
       userStore.getUserInfo()
       permsStore.loadPermslList()
       groupStore.loadGroupList()
+      typesStore.loadTypeList()
     } catch { }
     // getSubMenu()
-  }, [userStore, permsStore, groupStore])
+  }, [userStore, permsStore, groupStore, typesStore])
 
   const items = [
     getItem(<Link to={'/'}>数据概览</Link>, '/', <DashboardFilled />),
@@ -42,7 +43,7 @@ const GeekLayout = () => {
       [
         getItem(<Link to={'/contract/supplier/list'}>供应商</Link>, '/contract/supplier/list'),
         getItem(<Link to={'/contract/contract/list'}>合同列表</Link>, '/contract/contract/list'),
-        getItem(<Link to={'/contract/contract/add'}>合同提交</Link>, '/contract/contract/add'),
+        getItem(<Link to={'/contract/contract/add'}>提交表单</Link>, '/contract/contract/add'),
       ]),
   ]
 

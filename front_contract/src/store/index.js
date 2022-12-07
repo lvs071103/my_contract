@@ -5,6 +5,7 @@ import React from "react"
 import UserStore from "./user.Store"
 import PermsStore from "./perms.Store"
 import GroupStore from "./group.Store"
+import TypesStore from './types.Store'
 
 class RootStore {
   constructor() {
@@ -12,6 +13,7 @@ class RootStore {
     this.userStore = new UserStore()
     this.groupStore = new GroupStore()
     this.permsStore = new PermsStore()
+    this.typesStore = new TypesStore()
   }
 }
 

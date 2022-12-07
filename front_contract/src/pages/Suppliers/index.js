@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Tag, Input, Modal } from 'antd'
+import { Table, Card, Breadcrumb, Button, Space, Popconfirm, Input, Modal } from 'antd'
 import 'moment/locale/zh-cn'
 import './index.scss'
 import { http } from '@/utils'
 import { EditOutlined, DeleteOutlined, UnorderedListOutlined } from '@ant-design/icons'
+import SupplierForm from './supplier.Form'
 
 
 
@@ -126,7 +127,7 @@ export default function Supplier () {
     },
     {
       title: '联系人',
-      dataIndex: 'owner'
+      dataIndex: 'manager'
     },
     {
       title: '联系方式',
@@ -194,7 +195,7 @@ export default function Supplier () {
         }
 
         extra={
-          <Search placeholder="input search text" onSearch='' enterButton />
+          <Search placeholder="input search text" onSearch={onSearch} enterButton />
         }
       >
         <Modal
@@ -205,6 +206,11 @@ export default function Supplier () {
           width={860}
           centered
         >
+          <SupplierForm
+            handleOk={handleOk}
+            title={title}
+            id={title === '编辑' || title === '详情' ? row.id : null}
+          />
         </Modal>
         <Table
           rowKey={row => (row.id)}

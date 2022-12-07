@@ -102,7 +102,7 @@ class UserCreateView(APIView):
 
 
 class UserUpdateView(APIView):
-    my_module = User
+    model = User
     form_class = UserForm
     permission_classes = (IsAuthenticated, )
 
@@ -115,7 +115,7 @@ class UserUpdateView(APIView):
     def post(self, request, *args, **kwargs):
         form = self.form_class()
         data = {}
-        group_obj = self.my_module.objects.get(pk=kwargs['pk'])
+        group_obj = self.model.objects.get(pk=kwargs['pk'])
         body = json.loads(request.body.decode('utf-8'))['request_params']
         body.update({'password': make_password(body['password'])})
         form = self.form_class(data=body, instance=group_obj)
