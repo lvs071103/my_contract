@@ -6,6 +6,7 @@ import UserStore from "./user.Store"
 import PermsStore from "./perms.Store"
 import GroupStore from "./group.Store"
 import TypesStore from './types.Store'
+import SuppliersStore from "./suppliers.Store"
 
 class RootStore {
   constructor() {
@@ -14,6 +15,7 @@ class RootStore {
     this.groupStore = new GroupStore()
     this.permsStore = new PermsStore()
     this.typesStore = new TypesStore()
+    this.suppliersStore = new SuppliersStore()
   }
 }
 

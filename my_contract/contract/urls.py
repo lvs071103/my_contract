@@ -23,7 +23,10 @@ urlpatterns = [
     path('contract/getTypes',
          views.GetContractTypeView.as_view(),
          name='get_contract_types'),
-    path('contract/attachments/upload',
+    path('attachments/upload',
          views.AttachmentUploadView.as_view(),
-         name='attachments_upload')
+         name='attachments_upload'),
+    path('contract/add',
+         views.ContractCreateView.as_view(),
+         name='contract_add')
 ]

@@ -1,9 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from contract.serializers import SupplierSerializer, ContractSerializer
+from contract.serializers import SupplierSerializer, ContractSerializer, AttachmentSerializer
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from contract.models import Supplier, Contract, Attachment
-from contract.forms import SupplierForm, AttachmentForm
+from contract.forms import SupplierForm, AttachmentForm, ContractForm
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.core import serializers
@@ -185,6 +185,33 @@ class ContractListView(APIView):
         })
 
 
+class ContractCreateView(APIView):
+    permission_classes = (IsAuthenticated, )
+    model = Contract
+    form_class = ContractForm
+
+    def get(self, request):
+        return JsonResponse({
+            "message":
+            "this is only {} request".format(str(request.method).lower()),
+        })
+
+    def post(self, request):
+        data = {}
+        body = json.loads(request.body.decode('utf-8'))['request_params']
+        form = self.form_class(body)
+        if form.is_valid():
+            form.save()
+            data['success'] = True
+            data['message'] = 'saved'
+        else:
+            for field, errors in form.errors.items():
+                error = 'Field: {} Errors: {}'.format(field, ','.join(errors))
+                data = {'success': False, 'message': error}
+
+        return JsonResponse(data)
+
+
 class GetContractTypeView(APIView):
     permission_classes = (IsAuthenticated, )
     model = Contract
@@ -204,16 +231,26 @@ class AttachmentUploadView(APIView):
     permission_classes = (IsAuthenticated, )
     model = Attachment
     form_class = AttachmentForm
+    queryset_serializer = AttachmentSerializer
 
     def get(self, request):
+        print(request.method)
         return JsonResponse({
             "message":
             "this is only {} request".format(str(request.method).lower()),
         })
 
     def post(self, request):
+        data = {}
+        # files = request.FILES.getlist('doc_file')
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            data['success'] = True
+            data['message'] = 'uploaded.'
+        else:
+            for field, errors in form.errors.items():
+                error = 'Field: {} Errors: {}'.format(field, ','.join(errors))
+                data = {'success': False, 'message': error}
 
-        return JsonResponse({'success': True, "message": 'uploaded.'})
+        return JsonResponse(data=data)

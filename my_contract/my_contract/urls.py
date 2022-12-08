@@ -15,8 +15,10 @@ Including another URLconf
 """
 # from os import access
 # from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from my_contract import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -27,3 +29,7 @@ urlpatterns = [
     path('', include('hello.urls')),
     path('api/contract/', include('contract.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

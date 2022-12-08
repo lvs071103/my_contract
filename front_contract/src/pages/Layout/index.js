@@ -20,7 +20,7 @@ const GeekLayout = () => {
   // const [collapsed, setCollapsed] = useState(true)
   // pathname：url中的子路径
 
-  const { userStore, loginStore, permsStore, groupStore, typesStore } = useStore()
+  const { userStore, loginStore, permsStore, groupStore, typesStore, suppliersStore } = useStore()
   // 获取用户数据
   useEffect(() => {
     try {
@@ -28,9 +28,10 @@ const GeekLayout = () => {
       permsStore.loadPermslList()
       groupStore.loadGroupList()
       typesStore.loadTypeList()
+      suppliersStore.loadSupplierList()
     } catch { }
     // getSubMenu()
-  }, [userStore, permsStore, groupStore, typesStore])
+  }, [userStore, permsStore, groupStore, typesStore, suppliersStore])
 
   const items = [
     getItem(<Link to={'/'}>数据概览</Link>, '/', <DashboardFilled />),
