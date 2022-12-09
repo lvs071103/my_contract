@@ -10,10 +10,10 @@ class SupplierSerializer(serializers.ModelSerializer):
 
 
 class ContractSerializer(serializers.ModelSerializer):
-    suppliers = SupplierSerializer(read_only=True, many=True)
+    suppliers = SupplierSerializer(read_only=True)
 
     class Meta:
-        mode = Contract
+        model = Contract
         fields = '__all__'
 
 

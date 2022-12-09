@@ -37,6 +37,10 @@ class Contract(models.Model):
                                   null=True)
     owner = models.CharField(max_length=50, verbose_name='负责人')
 
+    def save(self, *args, **kwargs):
+        super(Contract, self).save(*args, **kwargs)
+        return self
+
 
 class Attachment(models.Model):
     doc_file = models.FileField(upload_to="documents/%Y/%m/%d/")

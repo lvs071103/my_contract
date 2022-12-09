@@ -44,7 +44,7 @@ export default function Contract () {
   // 避免性能损失
   useEffect(() => {
     const loadList = async () => {
-      const res = await http.get('/contract/contract/list', { params })
+      const res = await http.get('contract/contract/list', { params })
       console.log(res)
       const { data, count } = res.data
       setContracts({
@@ -105,38 +105,34 @@ export default function Contract () {
 
   const columns = [
     {
-      title: '封面',
-      dataIndex: 'cover',
-      width: 120,
-      render: cover => {
-        return <img src={cover.images[0]} width={80} height={60} alt="" />
-      }
-    },
-    {
-      title: '标题',
-      dataIndex: 'title',
+      title: '合同名',
+      dataIndex: 'name',
       width: 220
     },
     {
-      title: '状态',
-      dataIndex: 'status',
-      render: data => <Tag color="green">审核通过</Tag>
+      title: '类型',
+      dataIndex: 'types',
+      render: (text, _) => {
+        return `${text}` === '1' ?
+          <Tag color="green">合同</Tag> :
+          <Tag color="yellow">订单</Tag>
+      }
     },
     {
-      title: '发布时间',
-      dataIndex: 'pubdate'
+      title: '合同签定时间',
+      dataIndex: 'start_datetime'
     },
     {
-      title: '阅读数',
-      dataIndex: 'read_count'
+      title: '合同截止时间',
+      dataIndex: 'end_datetime'
     },
     {
-      title: '评论数',
-      dataIndex: 'comment_count'
+      title: '负责人',
+      dataIndex: 'owner'
     },
     {
-      title: '点赞数',
-      dataIndex: 'like_count'
+      title: '用途',
+      dataIndex: 'purpose'
     },
     {
       title: '操作',

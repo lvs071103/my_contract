@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.core import serializers
 from django.http import HttpResponse
 import json
+import datetime
 
 
 class SupplierListView(APIView):
@@ -163,12 +164,10 @@ class ContractListView(APIView):
         queryset = self.model.objects.get_queryset().order_by('id')
         page = request.GET.get('page', 1)
         page_size = request.GET.get('pageSize', None)
-
         if page_size is None:
             queryset_serializers = self.serializer_class(queryset, many=True)
         else:
             paginator = Paginator(queryset, page_size)
-
             try:
                 page_obj = paginator.get_page(page)
             except PageNotAnInteger:
@@ -198,10 +197,15 @@ class ContractCreateView(APIView):
 
     def post(self, request):
         data = {}
-        body = json.loads(request.body.decode('utf-8'))['request_params']
+        body = json.loads(request.body.decode('utf-8'))
+        body['create_datetime'] = datetime.datetime.now()
+        file_list = body['dragger']
         form = self.form_class(body)
         if form.is_valid():
-            form.save()
+            obj = form.save()
+            for f in file_list:
+                Attachment.objects.filter(pk=f['response']['pk']).update(
+                    contracts_id=obj.pk)
             data['success'] = True
             data['message'] = 'saved'
         else:
@@ -242,12 +246,13 @@ class AttachmentUploadView(APIView):
 
     def post(self, request):
         data = {}
-        # files = request.FILES.getlist('doc_file')
+        # files = request.FILES.get('doc_file')
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            obj = form.save()
             data['success'] = True
             data['message'] = 'uploaded.'
+            data['pk'] = obj.pk
         else:
             for field, errors in form.errors.items():
                 error = 'Field: {} Errors: {}'.format(field, ','.join(errors))

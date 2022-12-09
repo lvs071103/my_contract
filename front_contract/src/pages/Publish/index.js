@@ -46,6 +46,14 @@ export default function Publish () {
     },
   }
 
+  const normFile = (e) => {
+    console.log('Upload event:', e)
+    if (Array.isArray(e)) {
+      return e
+    }
+    return e?.fileList
+  }
+
   // 初始化useNaviage
   const navigate = useNavigate()
 
@@ -53,22 +61,23 @@ export default function Publish () {
   const onFinish = async (values) => {
     console.log(values)
     // 数据的二次处理 重点处理cover字段
-    const { name, type, suppliers, owner, start_datetime, stop_datetime } = values
+    const { name, types, suppliers, owner, dragger, start_datetime, end_datetime, purpose } = values
     const params = {
       name,
-      type,
+      types,
       suppliers,
       owner,
-      start_datetime,
-      stop_datetime,
-      attachments: {
-        file: fileList.map(item => item.url)
-      }
+      start_datetime: start_datetime.format('YYYY-MM-DD HH:mm:ss'),
+      end_datetime: end_datetime.format('YYYY-MM-DD HH:mm:ss'),
+      dragger,
+      purpose,
     }
+    console.log(params)
     // 新增合同接口
-    await http.post('contract/contract/add', params)
+    const res = await http.post('contract/contract/add', params)
+    console.log(res)
     // 跳转 提示用户
-    navigate('contract/contract/list')
+    navigate('/contract/contract/list')
     message.success('提交成功')
   }
 
@@ -96,7 +105,7 @@ export default function Publish () {
           </Form.Item>
           <Form.Item
             label="文本类型"
-            name="type"
+            name="types"
             rules={[{ required: true, message: '请选择文本类型' }]}
           >
             <Select placeholder="请选择文本类型" style={{ width: 400 }}>
@@ -127,17 +136,19 @@ export default function Publish () {
             <Input placeholder="请输入该合同的负责人或对接人" style={{ width: 400 }} />
           </Form.Item>
 
-          <Form.Item>
-            <Dragger {...props}>
-              <p className="ant-upload-drag-icon">
-                <InboxOutlined />
-              </p>
-              <p className="ant-upload-text">Click or drag file to this area to upload</p>
-              <p className="ant-upload-hint">
-                Support for a single or bulk upload. Strictly prohibit from uploading company data or other
-                band files
-              </p>
-            </Dragger>
+          <Form.Item label="附件">
+            <Form.Item name="dragger" valuePropName="fileList" getValueFromEvent={normFile} noStyle>
+              <Dragger {...props}>
+                <p className="ant-upload-drag-icon">
+                  <InboxOutlined />
+                </p>
+                <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                <p className="ant-upload-hint">
+                  Support for a single or bulk upload. Strictly prohibit from uploading company data or other
+                  band files
+                </p>
+              </Dragger>
+            </Form.Item>
           </Form.Item>
 
           <Form.Item
@@ -152,7 +163,7 @@ export default function Publish () {
           </Form.Item>
 
           <Form.Item
-            name="stop_datetime"
+            name="end_datetime"
             label="合同终止时间"
           >
             <DatePicker
