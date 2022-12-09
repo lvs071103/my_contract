@@ -289,9 +289,9 @@ class AttachmentDeleteView(APIView):
         try:
             res = get_object_or_404(self.model, pk=kwargs['pk'])
             res.delete()
-            filePath = os.path.join(MEDIA_ROOT, res.doc_file.url)
-            print(filePath)
-            # remove()
+            filePath = os.path.join(MEDIA_ROOT,
+                                    res.doc_file.name).replace('\\', '/')
+            remove(filePath)
         except self.model.DoesNotExist:
             raise Http404
         return JsonResponse({'success': True, 'message': 'deleted!'})
@@ -300,9 +300,9 @@ class AttachmentDeleteView(APIView):
         try:
             res = get_object_or_404(self.model, pk=kwargs['pk'])
             res.delete()
-            print(BASE_DIR)
-            filePath = os.path.join(BASE_DIR, 'media', res.doc_file.url)
-            print(filePath)
+            filePath = os.path.join(MEDIA_ROOT,
+                                    res.doc_file.name).replace('\\', '/')
+            remove(filePath)
         except self.model.DoesNotExist:
             raise Http404
         return JsonResponse({'success': True, 'message': 'deleted!'})

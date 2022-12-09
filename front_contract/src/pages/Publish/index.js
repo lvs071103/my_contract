@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React from 'react'
 import { Card, Breadcrumb, Form, Button, Input, Upload, Space, Select, message, DatePicker } from 'antd'
 import { InboxOutlined } from '@ant-design/icons'
 import { Link, useNavigate } from 'react-router-dom'
@@ -12,15 +12,6 @@ const { Option } = Select
 const { Dragger } = Upload
 
 export default function Publish () {
-
-  // 存放上传图片的列表
-  const [fileList, setFileList] = useState([])
-  // 切换图片类型
-  const [attachments, setAttachments] = useState(1)
-
-  // 使用useRef声明一个暂存仓库
-  const cacheFileList = useRef()
-
 
   const { typesStore, suppliersStore } = useStore()
 
@@ -55,7 +46,7 @@ export default function Publish () {
   }
 
   const normFile = (e) => {
-    console.log('Upload event:', e)
+    // console.log('Upload event:', e)
     if (Array.isArray(e)) {
       return e
     }
@@ -67,7 +58,6 @@ export default function Publish () {
 
   // 提交表单
   const onFinish = async (values) => {
-    console.log(values)
     // 数据的二次处理 重点处理cover字段
     const { name, types, suppliers, owner, dragger, start_datetime, end_datetime, purpose } = values
     const params = {
@@ -80,7 +70,6 @@ export default function Publish () {
       dragger,
       purpose,
     }
-    console.log(params)
     // 新增合同接口
     const res = await http.post('contract/contract/add', params)
     console.log(res)

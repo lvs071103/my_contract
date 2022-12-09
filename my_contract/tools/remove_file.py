@@ -2,7 +2,6 @@ import os
 
 
 def remove(filePath):
-    print(filePath)
     if os.path.exists(filePath):
         os.remove(filePath)
     else:
