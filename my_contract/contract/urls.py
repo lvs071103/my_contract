@@ -26,6 +26,9 @@ urlpatterns = [
     path('attachments/upload',
          views.AttachmentUploadView.as_view(),
          name='attachments_upload'),
+    re_path(r'attachments/delete/(?P<pk>\d+)$',
+            views.AttachmentDeleteView.as_view(),
+            name='attachments_delete'),
     path('contract/add',
          views.ContractCreateView.as_view(),
          name='contract_add')

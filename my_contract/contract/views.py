@@ -8,8 +8,11 @@ from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.core import serializers
 from django.http import HttpResponse
+import os
 import json
 import datetime
+from tools.remove_file import remove
+from my_contract.settings import MEDIA_ROOT, BASE_DIR
 
 
 class SupplierListView(APIView):
@@ -259,3 +262,47 @@ class AttachmentUploadView(APIView):
                 data = {'success': False, 'message': error}
 
         return JsonResponse(data=data)
+
+
+class AttachmentDeleteView(APIView):
+    model = Attachment
+    permission_classes = (IsAuthenticated, )
+    http_method_names = ['get', 'post', 'delete']
+
+    def dispatch(self, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'get':
+            return self.get(*args, **kwargs)
+        if method == 'delete':
+            return self.delete(*args, **kwargs)
+        if method == 'post':
+            return self.post(*args, **kwargs)
+        return super(AttachmentDeleteView, self).dispatch(*args, **kwargs)
+
+    def get(self, request):
+        return JsonResponse({
+            "message":
+            "this is only {} request".format(str(request.method).lower()),
+        })
+
+    def delete(self, *args, **kwargs):
+        try:
+            res = get_object_or_404(self.model, pk=kwargs['pk'])
+            res.delete()
+            filePath = os.path.join(MEDIA_ROOT, res.doc_file.url)
+            print(filePath)
+            # remove()
+        except self.model.DoesNotExist:
+            raise Http404
+        return JsonResponse({'success': True, 'message': 'deleted!'})
+
+    def post(self, *args, **kwargs):
+        try:
+            res = get_object_or_404(self.model, pk=kwargs['pk'])
+            res.delete()
+            print(BASE_DIR)
+            filePath = os.path.join(BASE_DIR, 'media', res.doc_file.url)
+            print(filePath)
+        except self.model.DoesNotExist:
+            raise Http404
+        return JsonResponse({'success': True, 'message': 'deleted!'})

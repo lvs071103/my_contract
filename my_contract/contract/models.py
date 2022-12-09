@@ -36,10 +36,8 @@ class Contract(models.Model):
                                   blank=True,
                                   null=True)
     owner = models.CharField(max_length=50, verbose_name='负责人')
-
-    def save(self, *args, **kwargs):
-        super(Contract, self).save(*args, **kwargs)
-        return self
+    # True 为 Done False为inprogress
+    status = models.BooleanField(verbose_name='状态', null=True, blank=True)
 
 
 class Attachment(models.Model):

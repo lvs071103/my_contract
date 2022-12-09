@@ -40,6 +40,14 @@ export default function Publish () {
       } else if (status === 'error') {
         message.error(`${info.file.name} file upload failed.`)
       }
+      if (status === 'removed') {
+        const removed = async () => {
+          console.log(info.file.response.pk)
+          const res = await http.post(`contract/attachments/delete/${info.file.response.pk}`)
+          console.log(res)
+        }
+        removed()
+      }
     },
     onDrop (e) {
       console.log('Dropped files', e.dataTransfer.files)
