@@ -20,6 +20,9 @@ urlpatterns = [
     path('contract/list',
          views.ContractListView.as_view(),
          name='contract_list'),
+    re_path(r'contract/detail/(?P<pk>\d+)$',
+            views.ContractDetailView.as_view(),
+            name='contract_detail'),
     path('contract/getTypes',
          views.GetContractTypeView.as_view(),
          name='get_contract_types'),
@@ -29,7 +32,10 @@ urlpatterns = [
     re_path(r'attachments/delete/(?P<pk>\d+)$',
             views.AttachmentDeleteView.as_view(),
             name='attachments_delete'),
-    path('contract/add',
+    path('contract/publish',
          views.ContractCreateView.as_view(),
-         name='contract_add')
+         name='contract_add'),
+    re_path(r'contract/edit/(?P<pk>\d+)$',
+            views.ContractUpdateView.as_view(),
+            name='contract_edit'),
 ]

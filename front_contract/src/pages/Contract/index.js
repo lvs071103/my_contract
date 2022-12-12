@@ -45,7 +45,7 @@ export default function Contract () {
   useEffect(() => {
     const loadList = async () => {
       const res = await http.get('contract/contract/list', { params })
-      console.log(res)
+      // console.log(res.data.data)
       const { data, count } = res.data
       setContracts({
         list: data,
@@ -56,7 +56,7 @@ export default function Contract () {
   }, [params])
 
   const onFinish = (values) => {
-    console.log(values)
+    // console.log(values)
     const { channel_id, date, status } = values
     //数据处理
     const _params = {}
@@ -100,7 +100,7 @@ export default function Contract () {
   // 编辑
   const navigate = useNavigate()
   const goPublish = (data) => {
-    navigate(`/publish?id=${data.id}`)
+    navigate(`/contract/contract/publish?contractId=${data.id}`)
   }
 
   const columns = [
@@ -129,6 +129,15 @@ export default function Contract () {
     {
       title: '负责人',
       dataIndex: 'owner'
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      render: (text, _) => {
+        return text === true ?
+          <Tag color="blue">已完成</Tag> :
+          <Tag color="green">履约中...</Tag>
+      }
     },
     {
       title: '用途',

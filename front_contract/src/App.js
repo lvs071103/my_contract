@@ -45,7 +45,7 @@ export default class App extends Component {
               <Route path='/accounts/group/list' element={<Group />}></Route>
               <Route path='/contract/contract/list' element={<Contract />}></Route>
               <Route path='/contract/supplier/list' element={<Supplier />}></Route>
-              <Route path='/contract/contract/add' element={<Publish />}></Route>
+              <Route path='/contract/contract/publish' element={<Publish />}></Route>
             </Route>
             <Route path='/login/' element={<Login />}></Route>
           </Routes>

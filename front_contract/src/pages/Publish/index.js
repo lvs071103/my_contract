@@ -1,11 +1,15 @@
 import React from 'react'
-import { Card, Breadcrumb, Form, Button, Input, Upload, Space, Select, message, DatePicker } from 'antd'
+import { Card, Breadcrumb, Form, Button, Input, Upload, Space, Select, message, DatePicker, Radio } from 'antd'
 import { InboxOutlined } from '@ant-design/icons'
 import { Link, useNavigate } from 'react-router-dom'
 import { getToken, http } from '@/utils'
 import { useStore } from '@/store'
 import 'moment/locale/zh-cn'
 import locale from 'antd/es/date-picker/locale/zh_CN'
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import moment from "moment"
+import { useState } from 'react'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -14,6 +18,8 @@ const { Dragger } = Upload
 export default function Publish () {
 
   const { typesStore, suppliersStore } = useStore()
+
+  const [value, setValue] = useState(0)
 
   const props = {
     label: '附件',
@@ -58,8 +64,8 @@ export default function Publish () {
 
   // 提交表单
   const onFinish = async (values) => {
-    // 数据的二次处理 重点处理cover字段
-    const { name, types, suppliers, owner, dragger, start_datetime, end_datetime, purpose } = values
+    console.log(values)
+    const { name, types, suppliers, owner, dragger, start_datetime, end_datetime, purpose, status } = values
     const params = {
       name,
       types,
@@ -69,13 +75,48 @@ export default function Publish () {
       end_datetime: end_datetime.format('YYYY-MM-DD HH:mm:ss'),
       dragger,
       purpose,
+      status
     }
     // 新增合同接口
-    const res = await http.post('contract/contract/add', params)
-    console.log(res)
+    if (contractId) {
+      await http.post(`contract/contract/edit/${contractId}`, params)
+    } else {
+      await http.post('contract/contract/add', params)
+    }
     // 跳转 提示用户
     navigate('/contract/contract/list')
     message.success('提交成功')
+  }
+
+  // 编辑并回填数据
+  const [params] = useSearchParams()
+  const contractId = params.get('contractId')
+  const formRef = React.createRef()
+  useEffect(() => {
+    const loadDetail = async () => {
+      const res = await http.get(`contract/contract/detail/${contractId}`)
+      const { fileList, data } = (res.data)
+      formRef.current.setFieldsValue({
+        name: data.name,
+        owner: data.owner,
+        types: data.types,
+        suppliers: data.suppliers.id,
+        start_datetime: moment(data.start_datetime),
+        end_datetime: moment(data.end_datetime),
+        status: data.status ? 1 : 0,
+        purpose: data.purpose,
+        dragger: fileList,
+      })
+    }
+    if (contractId) {
+      loadDetail()
+    }
+  }, // eslint-disable-next-line
+    [contractId])
+
+  const radioOnChange = (e) => {
+    console.log('radio checked', e.target.value)
+    setValue(e.target.value)
   }
 
   return (
@@ -91,6 +132,7 @@ export default function Publish () {
         }
       >
         <Form
+          ref={formRef}
           onFinish={onFinish}
         >
           <Form.Item
@@ -175,6 +217,16 @@ export default function Publish () {
             name="purpose"
           >
             <TextArea rows={3} />
+          </Form.Item>
+
+          <Form.Item
+            label="状态"
+            name="status"
+          >
+            <Radio.Group onChange={radioOnChange} defaultValue={value}>
+              <Radio value={0}> 履约中 </Radio>
+              <Radio value={1}> 完成 </Radio>
+            </Radio.Group>
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 4 }}>

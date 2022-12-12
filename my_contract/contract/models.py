@@ -37,7 +37,10 @@ class Contract(models.Model):
                                   null=True)
     owner = models.CharField(max_length=50, verbose_name='负责人')
     # True 为 Done False为inprogress
-    status = models.BooleanField(verbose_name='状态', null=True, blank=True)
+    status = models.BooleanField(verbose_name='状态',
+                                 null=True,
+                                 blank=True,
+                                 default=False)
 
 
 class Attachment(models.Model):

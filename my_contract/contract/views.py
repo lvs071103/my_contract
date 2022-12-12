@@ -234,6 +234,70 @@ class GetContractTypeView(APIView):
         return JsonResponse({'types': type_list})
 
 
+class ContractDetailView(APIView):
+    permission_classes = (IsAuthenticated, )
+    serializers_class = ContractSerializer
+    model = Contract
+
+    def get(self, request, pk):
+        try:
+            queryset = self.model.objects.get(pk=pk)
+        except self.model.DoesNotExist:
+            raise Http404
+
+        contract_serializers = self.serializers_class(queryset)
+        attachments = []
+        for item in queryset.attachment_set.all():
+            attachments.append({
+                'id': item.id,
+                'doc_file': item.doc_file.name,
+                'name': os.path.basename(item.doc_file.name),
+                'response': {
+                    'pk': item.id
+                }
+            })
+
+        return JsonResponse({
+            "data": contract_serializers.data,
+            "fileList": attachments,
+            'success': True,
+        })
+
+
+class ContractUpdateView(APIView):
+    model = Contract
+    form_class = ContractForm
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        return JsonResponse({
+            "message":
+            "this is only {} request".format(str(request.method).lower()),
+        })
+
+    def post(self, request, pk):
+        form = self.form_class()
+        data = {}
+        queryset = self.model.objects.get(pk=pk)
+        body = json.loads(request.body.decode('utf-8'))
+        file_list = body['dragger']
+        print(file_list)
+        form = self.form_class(data=body, instance=queryset)
+        if form.is_valid():
+            obj = form.save()
+            for f in file_list:
+                Attachment.objects.filter(pk=f['response']['pk']).update(
+                    contracts_id=obj.pk)
+            data['success'] = True
+            data['message'] = 'update!'
+        else:
+            for field, errors in form.errors.items():
+                error = 'Field: {} Errors: {}'.format(field, ','.join(errors))
+                data = {'success': False, 'message': error}
+
+        return JsonResponse(data)
+
+
 class AttachmentUploadView(APIView):
     permission_classes = (IsAuthenticated, )
     model = Attachment
