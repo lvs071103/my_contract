@@ -1,11 +1,25 @@
 import React, { useEffect, useState } from 'react'
-import { Table, Tag, Card, Space, Breadcrumb, Form, Button, Radio, DatePicker, Select, Popconfirm } from 'antd'
+import {
+  Table,
+  Tag,
+  Card,
+  Space,
+  Breadcrumb,
+  Form,
+  Button,
+  Radio,
+  DatePicker,
+  Select,
+  Popconfirm,
+  Drawer
+} from 'antd'
 import { http } from '@/utils'
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { EditOutlined, DeleteOutlined, UnorderedListOutlined } from '@ant-design/icons'
 import 'moment/locale/zh-cn'
 import locale from 'antd/es/date-picker/locale/zh_CN'
 import { useStore } from '@/store'
 import { Link, useNavigate } from 'react-router-dom'
+import Detail from './detail'
 
 
 const { Option } = Select
@@ -24,10 +38,9 @@ export default function Contract () {
   //   loadChannelList()
   // }, [])
 
-  // 文章列表管理 统一管理数据 将来修入给setList传对象
   const [contracts, setContracts] = useState({
-    list: [], //文章列表
-    count: 0 // 文章数量
+    list: [], //合同列表
+    count: 0 // 合同数量
   })
 
   // 文章参数管理
@@ -87,13 +100,13 @@ export default function Contract () {
 
   // 删除
 
-  const delArticle = async (data) => {
-    console.log(data)
-    await http.delete(`/contract/contracts/${data.id}`)
+  const delContract = async (data) => {
+    // console.log(data)
+    await http.delete(`contract/contract/delete/${data.id}`)
     // 刷新一下列表
     setParams({
       ...params,
-      page: 1
+      page: params.page
     })
   }
 
@@ -101,6 +114,19 @@ export default function Contract () {
   const navigate = useNavigate()
   const goPublish = (data) => {
     navigate(`/contract/contract/publish?contractId=${data.id}`)
+  }
+  // 详情
+
+  const [open, setOpen] = useState(false)
+  const [row, setRow] = useState({})
+
+  const onClose = () => {
+    setOpen(false)
+  }
+
+  const showDetail = (data) => {
+    setOpen(true)
+    setRow(data)
   }
 
   const columns = [
@@ -156,7 +182,7 @@ export default function Contract () {
             />
             <Popconfirm
               title="确认删除该条文章吗?"
-              onConfirm={() => delArticle(data)}
+              onConfirm={() => delContract(data)}
               okText="确认"
               cancelText="取消"
             >
@@ -168,6 +194,14 @@ export default function Contract () {
               // onClick={() => delArticle(data)}
               />
             </Popconfirm>
+
+            <Button
+              type="primary"
+              ghost
+              shape="circle"
+              icon={<UnorderedListOutlined />}
+              onClick={() => { showDetail(data) }}
+            />
 
           </Space>
         )
@@ -194,8 +228,8 @@ export default function Contract () {
           <Form.Item label="状态" name="status">
             <Radio.Group>
               <Radio value={-1}>全部</Radio>
-              <Radio value={0}>InProgress</Radio>
-              <Radio value={1}>Done</Radio>
+              <Radio value={0}>履约中</Radio>
+              <Radio value={1}>已完成</Radio>
             </Radio.Group>
           </Form.Item>
 
@@ -226,7 +260,7 @@ export default function Contract () {
       {/* 文章列表区域 */}
       <Card title={`根据筛选条件共查询到 ${contracts.count} 条结果：`}>
         <Table
-          rowKey="id"
+          rowKey={row => (row.id)}
           columns={columns}
           dataSource={contracts.list}
           pagination={
@@ -238,6 +272,15 @@ export default function Contract () {
           }
         />
       </Card>
+      <Drawer
+        title="详情"
+        placement="right"
+        size='large'
+        open={open}
+        onClose={onClose}
+      >
+        <Detail id={row.id} />
+      </Drawer>
     </div>
   )
 }

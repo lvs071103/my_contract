@@ -254,7 +254,10 @@ class ContractDetailView(APIView):
                 'name': os.path.basename(item.doc_file.name),
                 'response': {
                     'pk': item.id
-                }
+                },
+                'url': "http://localhost:8000" + item.doc_file.url,
+                'status': 'done',
+                'uid': item.id,
             })
 
         return JsonResponse({
@@ -281,7 +284,6 @@ class ContractUpdateView(APIView):
         queryset = self.model.objects.get(pk=pk)
         body = json.loads(request.body.decode('utf-8'))
         file_list = body['dragger']
-        print(file_list)
         form = self.form_class(data=body, instance=queryset)
         if form.is_valid():
             obj = form.save()
@@ -298,6 +300,42 @@ class ContractUpdateView(APIView):
         return JsonResponse(data)
 
 
+class ContractDeleteView(APIView):
+    model = Contract
+    permission_classes = (IsAuthenticated, )
+    http_method_names = ['get', 'post', 'delete']
+
+    def dispatch(self, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'get':
+            return self.get(*args, **kwargs)
+        if method == 'delete':
+            return self.delete(*args, **kwargs)
+        if method == 'post':
+            return self.post(*args, **kwargs)
+        return super(ContractDeleteView, self).dispatch(*args, **kwargs)
+
+    def get(self, request):
+        return JsonResponse({
+            "message":
+            "this is only {} request".format(str(request.method).lower()),
+        })
+
+    def delete(self, *args, **kwargs):
+        try:
+            get_object_or_404(self.model, pk=kwargs['pk']).delete()
+        except self.model.DoesNotExist:
+            raise Http404
+        return JsonResponse({'success': True, 'message': 'deleted!'})
+
+    def post(self, *args, **kwargs):
+        try:
+            get_object_or_404(self.model, pk=kwargs['pk']).delete()
+        except self.model.DoesNotExist:
+            raise Http404
+        return JsonResponse({'success': True, 'message': 'deleted!'})
+
+
 class AttachmentUploadView(APIView):
     permission_classes = (IsAuthenticated, )
     model = Attachment
@@ -305,7 +343,6 @@ class AttachmentUploadView(APIView):
     queryset_serializer = AttachmentSerializer
 
     def get(self, request):
-        print(request.method)
         return JsonResponse({
             "message":
             "this is only {} request".format(str(request.method).lower()),

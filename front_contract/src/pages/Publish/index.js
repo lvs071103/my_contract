@@ -1,5 +1,17 @@
 import React from 'react'
-import { Card, Breadcrumb, Form, Button, Input, Upload, Space, Select, message, DatePicker, Radio } from 'antd'
+import {
+  Card,
+  Breadcrumb,
+  Form,
+  Button,
+  Input,
+  Upload,
+  Space,
+  Select,
+  message,
+  DatePicker,
+  Radio
+} from 'antd'
 import { InboxOutlined } from '@ant-design/icons'
 import { Link, useNavigate } from 'react-router-dom'
 import { getToken, http } from '@/utils'
@@ -134,6 +146,9 @@ export default function Publish () {
         <Form
           ref={formRef}
           onFinish={onFinish}
+          initialValues={{
+            'status': value,
+          }}
         >
           <Form.Item
             label="合同名称"
@@ -223,7 +238,7 @@ export default function Publish () {
             label="状态"
             name="status"
           >
-            <Radio.Group onChange={radioOnChange} defaultValue={value}>
+            <Radio.Group onChange={radioOnChange}>
               <Radio value={0}> 履约中 </Radio>
               <Radio value={1}> 完成 </Radio>
             </Radio.Group>

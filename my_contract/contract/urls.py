@@ -38,4 +38,7 @@ urlpatterns = [
     re_path(r'contract/edit/(?P<pk>\d+)$',
             views.ContractUpdateView.as_view(),
             name='contract_edit'),
+    re_path(r'contract/delete/(?P<pk>\d+)$',
+            views.ContractDeleteView.as_view(),
+            name='contract_delete')
 ]
