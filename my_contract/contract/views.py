@@ -350,13 +350,16 @@ class AttachmentUploadView(APIView):
 
     def post(self, request):
         data = {}
-        # files = request.FILES.get('doc_file')
+        print(request.FILES.getlist('doc_file'))
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             obj = form.save()
             data['success'] = True
             data['message'] = 'uploaded.'
+            data['uid'] = obj.pk
             data['pk'] = obj.pk
+            data['name'] = os.path.basename(obj.doc_file.name)
+            data['url'] = request.META['HTTP_HOST'] + obj.doc_file.url
         else:
             for field, errors in form.errors.items():
                 error = 'Field: {} Errors: {}'.format(field, ','.join(errors))

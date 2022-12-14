@@ -22,6 +22,8 @@ import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import moment from "moment"
 import { useState } from 'react'
+// import { observer } from 'mobx-react-lite'
+import { flushSync } from 'react-dom'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -30,7 +32,7 @@ const { Dragger } = Upload
 export default function Publish () {
 
   const { typesStore, suppliersStore } = useStore()
-
+  const [fileList, setFileList] = useState([])
   const [value, setValue] = useState(0)
 
   const props = {
@@ -42,7 +44,7 @@ export default function Publish () {
     onChange (info) {
       const { status } = info.file
       if (status !== 'uploading') {
-        console.log(info.file, info.fileList)
+        // console.log(info.file, info.fileList)
       }
       if (status === 'done') {
         message.success(`${info.file.name} file uploaded successfully.`)
@@ -51,13 +53,13 @@ export default function Publish () {
       }
       if (status === 'removed') {
         const removed = async () => {
-          console.log(info.file.response.pk)
-          const res = await http.post(`contract/attachments/delete/${info.file.response.pk}`)
-          console.log(res)
+          await http.post(`contract/attachments/delete/${info.file.response.pk}`)
         }
         removed()
       }
+      flushSync(() => { setFileList(info.fileList) })
     },
+
     onDrop (e) {
       console.log('Dropped files', e.dataTransfer.files)
     },
@@ -77,7 +79,16 @@ export default function Publish () {
   // 提交表单
   const onFinish = async (values) => {
     console.log(values)
-    const { name, types, suppliers, owner, dragger, start_datetime, end_datetime, purpose, status } = values
+    const {
+      name,
+      types,
+      suppliers,
+      owner,
+      dragger,
+      start_datetime,
+      end_datetime,
+      purpose,
+      status } = values
     const params = {
       name,
       types,
@@ -93,7 +104,7 @@ export default function Publish () {
     if (contractId) {
       await http.post(`contract/contract/edit/${contractId}`, params)
     } else {
-      await http.post('contract/contract/add', params)
+      await http.post('contract/contract/publish', params)
     }
     // 跳转 提示用户
     navigate('/contract/contract/list')
@@ -191,7 +202,7 @@ export default function Publish () {
           </Form.Item>
 
           <Form.Item label="附件">
-            <Form.Item name="dragger" valuePropName="fileList" getValueFromEvent={normFile} noStyle>
+            <Form.Item name="dragger" valuePropName={fileList} getValueFromEvent={normFile} noStyle>
               <Dragger {...props}>
                 <p className="ant-upload-drag-icon">
                   <InboxOutlined />

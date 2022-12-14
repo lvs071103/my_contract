@@ -19,7 +19,8 @@ import 'moment/locale/zh-cn'
 import locale from 'antd/es/date-picker/locale/zh_CN'
 import { useStore } from '@/store'
 import { Link, useNavigate } from 'react-router-dom'
-import Detail from './detail'
+// import Detail from './detail'
+import Detail from './test'
 
 
 const { Option } = Select
