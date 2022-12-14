@@ -6,13 +6,13 @@ from contract.models import Supplier, Contract, Attachment
 from contract.forms import SupplierForm, AttachmentForm, ContractForm
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
-from django.core import serializers
-from django.http import HttpResponse
+# from django.core import serializers
+# from django.http import HttpResponse
 import os
 import json
 import datetime
 from tools.remove_file import remove
-from my_contract.settings import MEDIA_ROOT, BASE_DIR
+from my_contract.settings import MEDIA_ROOT
 
 
 class SupplierListView(APIView):
@@ -105,7 +105,6 @@ class SupplierUpdateView(APIView):
         })
 
     def post(self, request, pk):
-        form = self.form_class()
         data = {}
         supplier_obj = self.model.objects.get(pk=pk)
         body = json.loads(request.body.decode('utf-8'))['request_params']
@@ -225,8 +224,8 @@ class GetContractTypeView(APIView):
 
     def get(self, request):
         type_list = []
+        element = {}
         for c in self.model.types.field.choices:
-            element = {}
             element['id'] = c[0]
             element['name'] = c[1]
             type_list.append(element)
@@ -279,7 +278,6 @@ class ContractUpdateView(APIView):
         })
 
     def post(self, request, pk):
-        form = self.form_class()
         data = {}
         queryset = self.model.objects.get(pk=pk)
         body = json.loads(request.body.decode('utf-8'))
@@ -350,7 +348,6 @@ class AttachmentUploadView(APIView):
 
     def post(self, request):
         data = {}
-        # files = request.FILES.get('doc_file')
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             obj = form.save()
@@ -390,9 +387,9 @@ class AttachmentDeleteView(APIView):
         try:
             res = get_object_or_404(self.model, pk=kwargs['pk'])
             res.delete()
-            filePath = os.path.join(MEDIA_ROOT,
-                                    res.doc_file.name).replace('\\', '/')
-            remove(filePath)
+            file_path = os.path.join(MEDIA_ROOT,
+                                     res.doc_file.name).replace('\\', '/')
+            remove(file_path)
         except self.model.DoesNotExist:
             raise Http404
         return JsonResponse({'success': True, 'message': 'deleted!'})
@@ -401,9 +398,9 @@ class AttachmentDeleteView(APIView):
         try:
             res = get_object_or_404(self.model, pk=kwargs['pk'])
             res.delete()
-            filePath = os.path.join(MEDIA_ROOT,
-                                    res.doc_file.name).replace('\\', '/')
-            remove(filePath)
+            file_path = os.path.join(MEDIA_ROOT,
+                                     res.doc_file.name).replace('\\', '/')
+            remove(file_path)
         except self.model.DoesNotExist:
             raise Http404
         return JsonResponse({'success': True, 'message': 'deleted!'})

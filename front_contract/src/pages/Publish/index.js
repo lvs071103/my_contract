@@ -22,6 +22,7 @@ import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import moment from "moment"
 import { useState } from 'react'
+import { flushSync } from 'react-dom'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -30,7 +31,7 @@ const { Dragger } = Upload
 export default function Publish () {
 
   const { typesStore, suppliersStore } = useStore()
-
+  const [fileList, setFileList] = useState([])
   const [value, setValue] = useState(0)
 
   const props = {
@@ -49,11 +50,12 @@ export default function Publish () {
       } else if (status === 'error') {
         message.error(`${info.file.name} file upload failed.`)
       }
+      flushSync(() => {
+        setFileList(info.fileList)
+      })
       if (status === 'removed') {
         const removed = async () => {
-          console.log(info.file.response.pk)
-          const res = await http.post(`contract/attachments/delete/${info.file.response.pk}`)
-          console.log(res)
+          await http.post(`contract/attachments/delete/${info.file.response.pk}`)
         }
         removed()
       }
@@ -64,7 +66,8 @@ export default function Publish () {
   }
 
   const normFile = (e) => {
-    // console.log('Upload event:', e)
+    console.log(fileList)
+    console.log('Upload event:', e)
     if (Array.isArray(e)) {
       return e
     }
@@ -93,7 +96,7 @@ export default function Publish () {
     if (contractId) {
       await http.post(`contract/contract/edit/${contractId}`, params)
     } else {
-      await http.post('contract/contract/add', params)
+      await http.post('contract/contract/publish', params)
     }
     // 跳转 提示用户
     navigate('/contract/contract/list')
