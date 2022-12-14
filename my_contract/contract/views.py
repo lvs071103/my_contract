@@ -52,7 +52,8 @@ class SupplierCreateView(APIView):
     model = Supplier
     form_class = SupplierForm
 
-    def get(self, request):
+    @staticmethod
+    def get(request):
         return JsonResponse({
             "message":
             "this is only {} request".format(str(request.method).lower()),
@@ -98,7 +99,8 @@ class SupplierUpdateView(APIView):
     form_class = SupplierForm
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
+    @staticmethod
+    def get(request):
         return JsonResponse({
             "message":
             "this is only {} request".format(str(request.method).lower()),
@@ -136,7 +138,8 @@ class SupplierDeleteView(APIView):
             return self.post(*args, **kwargs)
         return super(SupplierDeleteView, self).dispatch(*args, **kwargs)
 
-    def get(self, request):
+    @staticmethod
+    def get(request):
         return JsonResponse({
             "message":
             "this is only {} request".format(str(request.method).lower()),
@@ -340,7 +343,8 @@ class AttachmentUploadView(APIView):
     form_class = AttachmentForm
     queryset_serializer = AttachmentSerializer
 
-    def get(self, request):
+    @staticmethod
+    def get(request):
         return JsonResponse({
             "message":
             "this is only {} request".format(str(request.method).lower()),
@@ -381,7 +385,8 @@ class AttachmentDeleteView(APIView):
             return self.post(*args, **kwargs)
         return super(AttachmentDeleteView, self).dispatch(*args, **kwargs)
 
-    def get(self, request):
+    @staticmethod
+    def get(request):
         return JsonResponse({
             "message":
             "this is only {} request".format(str(request.method).lower()),
