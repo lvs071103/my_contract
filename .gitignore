@@ -8,3 +8,4 @@ front_contract/node_modules
 my_contract/my_contract/__pycache__/
 my_contract/my_contract/media/
 my_contract/contract/migrations/
+my_contract/media/
