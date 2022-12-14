@@ -22,6 +22,7 @@ import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import moment from "moment"
 import { useState } from 'react'
+// import { observer } from 'mobx-react-lite'
 import { flushSync } from 'react-dom'
 
 const { TextArea } = Input
@@ -43,7 +44,7 @@ export default function Publish () {
     onChange (info) {
       const { status } = info.file
       if (status !== 'uploading') {
-        console.log(info.file, info.fileList)
+        // console.log(info.file, info.fileList)
       }
       if (status === 'done') {
         message.success(`${info.file.name} file uploaded successfully.`)
@@ -59,7 +60,9 @@ export default function Publish () {
         }
         removed()
       }
+      flushSync(() => { setFileList(info.fileList) })
     },
+
     onDrop (e) {
       console.log('Dropped files', e.dataTransfer.files)
     },
@@ -80,7 +83,16 @@ export default function Publish () {
   // 提交表单
   const onFinish = async (values) => {
     console.log(values)
-    const { name, types, suppliers, owner, dragger, start_datetime, end_datetime, purpose, status } = values
+    const {
+      name,
+      types,
+      suppliers,
+      owner,
+      dragger,
+      start_datetime,
+      end_datetime,
+      purpose,
+      status } = values
     const params = {
       name,
       types,
