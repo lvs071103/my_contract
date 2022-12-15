@@ -25,6 +25,7 @@ import { useState } from 'react'
 // import { observer } from 'mobx-react-lite'
 import { flushSync } from 'react-dom'
 
+
 const { TextArea } = Input
 const { Option } = Select
 const { Dragger } = Upload
@@ -70,7 +71,6 @@ export default function Publish () {
 
   const normFile = (e) => {
     console.log(fileList)
-    // console.log('Upload event:', e)
     if (Array.isArray(e)) {
       return e
     }
@@ -88,6 +88,7 @@ export default function Publish () {
       types,
       suppliers,
       owner,
+      price,
       dragger,
       start_datetime,
       end_datetime,
@@ -98,6 +99,7 @@ export default function Publish () {
       types,
       suppliers,
       owner,
+      price,
       start_datetime: start_datetime.format('YYYY-MM-DD HH:mm:ss'),
       end_datetime: end_datetime.format('YYYY-MM-DD HH:mm:ss'),
       dragger,
@@ -126,6 +128,7 @@ export default function Publish () {
       formRef.current.setFieldsValue({
         name: data.name,
         owner: data.owner,
+        price: data.price,
         types: data.types,
         suppliers: data.suppliers.id,
         start_datetime: moment(data.start_datetime),
@@ -142,7 +145,7 @@ export default function Publish () {
     [contractId])
 
   const radioOnChange = (e) => {
-    console.log('radio checked', e.target.value)
+    // console.log('radio checked', e.target.value)
     setValue(e.target.value)
   }
 
@@ -195,6 +198,14 @@ export default function Publish () {
                 <Option value={item.id} key={item.id}>{item.name}</Option>
               ))}
             </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="合同价格"
+            name="price"
+            rules={[{ required: true, message: '请输入该合同的价格' }]}
+          >
+            <Input type='number' placeholder="请输入该合同的价格" style={{ width: 400 }} />
           </Form.Item>
 
           <Form.Item

@@ -20,6 +20,7 @@ class Contract(models.Model):
     )
     name = models.CharField(verbose_name='名称', unique=True, max_length=50)
     types = models.CharField(max_length=1, choices=TYPE_CHOICE, default='1')
+    price = models.IntegerField(verbose_name='价格')
     create_datetime = models.DateTimeField(verbose_name='创建时间',
                                            blank=True,
                                            null=True,

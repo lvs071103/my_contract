@@ -48,6 +48,7 @@ const Detail = (props) => {
     <>
       <Descriptions title="基本信息" layout="vertical" bordered>
         <Descriptions.Item label="合同名称">{contracts.name}</Descriptions.Item>
+        <Descriptions.Item label="合同价格">{contracts.price}</Descriptions.Item>
         <Descriptions.Item label="文本类型">{contracts.types === '1' ? '合同' : '订单'}</Descriptions.Item>
         <Descriptions.Item label="项目经理">{contracts.owner}</Descriptions.Item>
         <Descriptions.Item label="创建时间">

@@ -13,6 +13,10 @@ import json
 import datetime
 from tools.remove_file import remove
 from my_contract.settings import MEDIA_ROOT
+from django.utils.timezone import make_aware
+from my_contract.settings import TIME_ZONE
+from django.db.models import Q
+from tools.transfer_string_date import transfer
 
 
 class SupplierListView(APIView):
@@ -169,7 +173,23 @@ class ContractListView(APIView):
         queryset = self.model.objects.get_queryset().order_by('id')
         page = request.GET.get('page', 1)
         page_size = request.GET.get('pageSize', None)
-        if page_size is None:
+        status = request.GET.get('status', None)
+        start_datetime = request.GET.get('start_datetime', None)
+        end_datetime = request.GET.get('end_datetime', None)
+        type_id = request.GET.get('type_id', None)
+
+        if status and start_datetime and end_datetime and type_id:
+            TIME_ZONE
+            new_start = make_aware(transfer(start_datetime))
+            new_end = make_aware(transfer(end_datetime))
+            queryset = self.model.objects.filter(
+                Q(start_datetime__gt=new_start) and
+                Q(end_datetime__lt=new_end) and
+                Q(status=status) and
+                Q(types=type_id)).order_by('id')
+            queryset_serializers = self.serializer_class(queryset, many=True)
+
+        elif page_size is None:
             queryset_serializers = self.serializer_class(queryset, many=True)
         else:
             paginator = Paginator(queryset, page_size)
@@ -227,8 +247,8 @@ class GetContractTypeView(APIView):
 
     def get(self, request):
         type_list = []
-        element = {}
         for c in self.model.types.field.choices:
+            element = dict()
             element['id'] = c[0]
             element['name'] = c[1]
             type_list.append(element)
@@ -316,7 +336,8 @@ class ContractDeleteView(APIView):
             return self.post(*args, **kwargs)
         return super(ContractDeleteView, self).dispatch(*args, **kwargs)
 
-    def get(self, request):
+    @staticmethod
+    def get(request):
         return JsonResponse({
             "message":
             "this is only {} request".format(str(request.method).lower()),
@@ -352,7 +373,6 @@ class AttachmentUploadView(APIView):
 
     def post(self, request):
         data = {}
-        print(request.FILES.getlist('doc_file'))
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
             obj = form.save()

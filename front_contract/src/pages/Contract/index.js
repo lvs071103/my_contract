@@ -26,24 +26,15 @@ const { Option } = Select
 const { RangePicker } = DatePicker
 
 export default function Contract () {
-  // 频道列表管理移入store中
+  // 类型列表管理移入store中
   const { typesStore } = useStore()
-  // 频道列表管理
-  // const [channelList, setChannelList] = useState([])
-  // const loadChannelList = async () => {
-  //   const res = await http.get('/channels')
-  //   setChannelList(res.data.channels)
-  // }
-  // useEffect(() => {
-  //   loadChannelList()
-  // }, [])
 
   const [contracts, setContracts] = useState({
     list: [], //合同列表
     count: 0 // 合同数量
   })
 
-  // 文章参数管理
+  // 合同参数管理
   const [params, setParams] = useState({
     page: 1,
     pageSize: 10,
@@ -70,18 +61,18 @@ export default function Contract () {
 
   const onFinish = (values) => {
     // console.log(values)
-    const { channel_id, date, status } = values
+    const { type_id, date, status } = values
     //数据处理
     const _params = {}
     if (status !== -1) {
       _params.status = status
     }
-    if (channel_id) {
-      _params.channel_id = channel_id
+    if (type_id) {
+      _params.type_id = type_id
     }
     if (date) {
-      _params.begin_pubdate = date[0].format('YYYY-MM-DD')
-      _params.end_pubdate = date[1].format('YYYY-MM-DD')
+      _params.start_datetime = date[0].format('YYYY-MM-DD')
+      _params.end_datetime = date[1].format('YYYY-MM-DD')
     }
     // 修改params数据， 引起接口重新发送，对象的合并是一个整体覆盖，改了对像的整体引用
     // setParams(params)
@@ -239,8 +230,8 @@ export default function Contract () {
               // defaultValue="lucy"
               style={{ width: 120 }}
             >
-              {typesStore.typeList.map(channel => (
-                <Option value={channel.id} key={channel.id}>{channel.name}</Option>
+              {typesStore.typeList.map(type => (
+                <Option value={type.id} key={type.id}>{type.name}</Option>
               ))}
             </Select>
           </Form.Item>
