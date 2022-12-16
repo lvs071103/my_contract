@@ -183,10 +183,8 @@ class ContractListView(APIView):
             new_start = make_aware(transfer(start_datetime))
             new_end = make_aware(transfer(end_datetime))
             queryset = self.model.objects.filter(
-                Q(start_datetime__gt=new_start) and
-                Q(end_datetime__lt=new_end) and
-                Q(status=status) and
-                Q(types=type_id)).order_by('id')
+                Q(start_datetime__gt=new_start) and Q(end_datetime__lt=new_end)
+                and Q(status=status) and Q(types=type_id)).order_by('id')
             queryset_serializers = self.serializer_class(queryset, many=True)
 
         elif page_size is None:
@@ -271,15 +269,23 @@ class ContractDetailView(APIView):
         attachments = []
         for item in queryset.attachment_set.all():
             attachments.append({
-                'id': item.id,
-                'doc_file': item.doc_file.name,
-                'name': os.path.basename(item.doc_file.name),
+                'id':
+                item.id,
+                'doc_file':
+                item.doc_file.name,
+                'name':
+                os.path.basename(item.doc_file.name),
                 'response': {
                     'pk': item.id
                 },
-                'url': "http://localhost:8000" + item.doc_file.url,
-                'status': 'done',
-                'uid': item.id,
+                'url':
+                "http://" + request.META['HTTP_HOST'] + item.doc_file.url,
+                'status':
+                'done',
+                'uid':
+                item.id,
+                'linkProps':
+                '{"download": "file"}'
             })
 
         return JsonResponse({

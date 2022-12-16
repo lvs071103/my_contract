@@ -3,7 +3,7 @@ import { Descriptions, Badge, Upload } from 'antd'
 import { useEffect } from 'react'
 import { http } from '@/utils'
 import moment from "moment"
-
+// import { FileService } from 'fileservice'
 
 
 const Detail = (props) => {
@@ -34,11 +34,19 @@ const Detail = (props) => {
     }
   }, [id])
 
-  const test = {
+  const attachments = {
     fileList: files,
-    onDownload: file => {
-      console.log(111111111111)
-    },
+    // onDownload: (file) => {
+    //   console.log(111111)
+    //   const a = document.createElement("a")
+    //   a.href = file.url
+    //   a.download = file.name
+    //   a.target = "_blank"
+    //   document.body.appendChild(a)
+    //   a.click()
+    //   // clean up and remove the link
+    //   window.URL.revokeObjectURL(file)
+    // },
     showUploadList: {
       showDownloadIcon: true,
       showRemoveIcon: false,
@@ -60,47 +68,52 @@ const Detail = (props) => {
         <Descriptions.Item label="合同截止时间">
           {moment(contracts.end_datetime).format("YYYY-MM-DD HH:mm:ss")}
         </Descriptions.Item>
-        <Descriptions.Item label="状态" span={3}>
+        <Descriptions.Item label="状态">
           {contracts.status ?
             <Badge status="processing" text="已完成" /> :
             <Badge status="processing" text="履约中" />
           }
         </Descriptions.Item>
-        <Descriptions.Item label="用途" span={3}>
+        <Descriptions.Item label="用途">
           {contracts.purpose}
         </Descriptions.Item>
 
         <Descriptions.Item label="供应商">
           {contracts.suppliers &&
             contracts.suppliers.name ?
-            contracts.suppliers.name : null}
+            contracts.suppliers.name : null
+          }
         </Descriptions.Item>
         <Descriptions.Item label="联系人">
           {contracts.suppliers &&
             contracts.suppliers.manager ?
-            contracts.suppliers.manager : null}
+            contracts.suppliers.manager : null
+          }
         </Descriptions.Item>
         <Descriptions.Item label="联系电话">
           {contracts.suppliers &&
             contracts.suppliers.tel ?
-            contracts.suppliers.tel : null}
+            contracts.suppliers.tel : null
+          }
         </Descriptions.Item>
 
         <Descriptions.Item label="描述" span={3}>
           {contracts.suppliers &&
             contracts.suppliers.desc ?
-            contracts.suppliers.desc : null}
+            contracts.suppliers.desc : null
+          }
         </Descriptions.Item>
       </Descriptions>
+      {/* 附件 */}
       <br />
       <Descriptions title="附件信息" layout="vertical" bordered>
         <Descriptions.Item label="附件">
-          <Upload {...test}>
+          <Upload {...attachments}>
           </Upload>
         </Descriptions.Item>
       </Descriptions>
-
     </>
   )
 }
+
 export default Detail

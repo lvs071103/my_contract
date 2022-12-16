@@ -8,16 +8,18 @@ import {
 import './index.scss'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useStore } from '@/store'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 
 const { Header, Sider } = Layout
 
+const rootSubmenuKeys = ['/', 'sub1', 'sub2']
+
 const GeekLayout = () => {
 
   const { pathname } = useLocation()
-  // const [openKey, setOpenKey] = useState('/')
-  // const [collapsed, setCollapsed] = useState(true)
+  const [openKeys, setOpenKeys] = useState(['/'])
+  // const [collapsed, setCollapsed] = useState(false)
   // pathname：url中的子路径
 
   const { userStore, loginStore, permsStore, groupStore, typesStore, suppliersStore } = useStore()
@@ -30,8 +32,34 @@ const GeekLayout = () => {
       typesStore.loadTypeList()
       suppliersStore.loadSupplierList()
     } catch { }
-    // getSubMenu()
-  }, [userStore, permsStore, groupStore, typesStore, suppliersStore])
+    // 刷新页面获取子菜单
+    const getSubKeys = () => {
+      const list = []
+      items.map((item) => {
+        if (item.children) {
+          item.children.map((s) => {
+            if (s.key === pathname) {
+              list.push(item.key)
+            }
+            return {}
+          })
+        }
+        return {}
+      })
+      setOpenKeys(list)
+    }
+    getSubKeys()
+  }, // eslint-disable-next-line
+    [userStore, permsStore, groupStore, typesStore, suppliersStore])
+
+  const onOpenChange = (keys) => {
+    const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1)
+    if (rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
+      setOpenKeys(keys)
+    } else {
+      setOpenKeys(latestOpenKey ? [latestOpenKey] : [])
+    }
+  }
 
   const items = [
     getItem(<Link to={'/'}>数据概览</Link>, '/', <DashboardFilled />),
@@ -87,27 +115,10 @@ const GeekLayout = () => {
           <Menu
             mode="inline"
             theme="dark"
+            openKeys={openKeys}
+            onOpenChange={onOpenChange}
             defaultSelectedKeys={[pathname]}
-            // 高亮原理： selectedKeys === item key
             selectedKeys={[pathname]}
-            style={{ height: '100%', borderRight: 0 }}
-            // inlineCollapsed={collapsed}
-            defaultOpenKeys={() => {
-              const list = []
-              items.map((item) => {
-                if (item.children) {
-                  item.children.map((s) => {
-                    if (s.key === pathname) {
-                      list.push(item.key)
-                    }
-                    return {}
-                  })
-                }
-                return {}
-              })
-              return list
-            }
-            }
             items={items}
           >
           </Menu>
