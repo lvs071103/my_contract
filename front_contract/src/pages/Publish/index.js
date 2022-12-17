@@ -15,7 +15,6 @@ import {
 import { InboxOutlined } from '@ant-design/icons'
 import { Link, useNavigate } from 'react-router-dom'
 import { getToken, http } from '@/utils'
-import { useStore } from '@/store'
 import 'moment/locale/zh-cn'
 import locale from 'antd/es/date-picker/locale/zh_CN'
 import { useEffect } from 'react'
@@ -24,6 +23,7 @@ import moment from "moment"
 import { useState } from 'react'
 // import { observer } from 'mobx-react-lite'
 import { flushSync } from 'react-dom'
+import { typeList } from 'antd/lib/message'
 
 
 const { TextArea } = Input
@@ -32,8 +32,29 @@ const { Dragger } = Upload
 
 export default function Publish () {
 
-  const { typesStore, suppliersStore } = useStore()
+  // 定义合作伙伴和文本类型
+  const [suppliers, setSuppliers] = useState([])
+  const [types, setTypes] = useState([])
+
+  // 获取合作伙伴和文本类型
+  useEffect(() => {
+    const loadSupplierList = async () => {
+      const res = await http.get('/contract/supplier/list')
+      const supplierList = res.data.data
+      setSuppliers(supplierList)
+    }
+    const loadTypeList = async () => {
+      const res = await http.get('/contract/contract/getTypes')
+      typeList = res.data.types
+      setTypes(typeList)
+    }
+    loadSupplierList()
+    loadTypeList()
+  }, [])
+
+  // 定义上传文件列表
   const [fileList, setFileList] = useState([])
+  // 定义单选框初始值
   const [value, setValue] = useState(0)
 
   const props = {
@@ -47,14 +68,17 @@ export default function Publish () {
       if (status !== 'uploading') {
         // console.log(info.file, info.fileList)
       }
+      // 上传成功
       if (status === 'done') {
         message.success(`${info.file.name} file uploaded successfully.`)
+        // 上传失败
       } else if (status === 'error') {
         message.error(`${info.file.name} file upload failed.`)
       }
       flushSync(() => {
         setFileList(info.fileList)
       })
+      // 移除文件
       if (status === 'removed') {
         const removed = async () => {
           await http.post(`contract/attachments/delete/${info.file.response.pk}`)
@@ -112,7 +136,7 @@ export default function Publish () {
     } else {
       await http.post('contract/contract/publish', params)
     }
-    // 跳转 提示用户
+    // 跳转至合同列表
     navigate('/contract/contract/list')
     message.success('提交成功')
   }
@@ -181,7 +205,7 @@ export default function Publish () {
             rules={[{ required: true, message: '请选择文本类型' }]}
           >
             <Select placeholder="请选择文本类型" style={{ width: 400 }}>
-              {typesStore.typeList.map(item => (
+              {types.map(item => (
                 <Option value={item.id} key={item.id}>{item.name}</Option>
               ))}
 
@@ -194,7 +218,7 @@ export default function Publish () {
             rules={[{ required: true, message: '请选择供合作伙伴' }]}
           >
             <Select placeholder="请选择合作伙伴" style={{ width: 400 }}>
-              {suppliersStore.supplierList.map(item => (
+              {suppliers.map(item => (
                 <Option value={item.id} key={item.id}>{item.name}</Option>
               ))}
             </Select>

@@ -17,18 +17,17 @@ import { http } from '@/utils'
 import { EditOutlined, DeleteOutlined, UnorderedListOutlined } from '@ant-design/icons'
 import 'moment/locale/zh-cn'
 import locale from 'antd/es/date-picker/locale/zh_CN'
-import { useStore } from '@/store'
 import { Link, useNavigate } from 'react-router-dom'
 import Detail from './detail'
+import { typeList } from 'antd/lib/message'
 
 
 const { Option } = Select
 const { RangePicker } = DatePicker
 
 export default function Contract () {
-  // 类型列表管理移入store中
-  const { typesStore } = useStore()
 
+  const [types, setTypes] = useState([])
   const [contracts, setContracts] = useState({
     list: [], //合同列表
     count: 0 // 合同数量
@@ -49,13 +48,18 @@ export default function Contract () {
   useEffect(() => {
     const loadList = async () => {
       const res = await http.get('contract/contract/list', { params })
-      // console.log(res.data.data)
       const { data, count } = res.data
       setContracts({
         list: data,
         count: count,
       })
     }
+    const loadTypeList = async () => {
+      const res = await http.get('/contract/contract/getTypes')
+      typeList = res.data.types
+      setTypes(typeList)
+    }
+    loadTypeList()
     loadList()
   }, [params])
 
@@ -230,7 +234,7 @@ export default function Contract () {
               // defaultValue="lucy"
               style={{ width: 120 }}
             >
-              {typesStore.typeList.map(type => (
+              {types.map(type => (
                 <Option value={type.id} key={type.id}>{type.name}</Option>
               ))}
             </Select>

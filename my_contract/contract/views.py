@@ -269,23 +269,16 @@ class ContractDetailView(APIView):
         attachments = []
         for item in queryset.attachment_set.all():
             attachments.append({
-                'id':
-                item.id,
-                'doc_file':
-                item.doc_file.name,
-                'name':
-                os.path.basename(item.doc_file.name),
+                'id': item.id,
+                'doc_file': item.doc_file.name,
+                'name': os.path.basename(item.doc_file.name),
                 'response': {
                     'pk': item.id
                 },
-                'url':
-                "http://" + request.META['HTTP_HOST'] + item.doc_file.url,
-                'status':
-                'done',
-                'uid':
-                item.id,
-                'linkProps':
-                '{"download": "file"}'
+                'url': "http://" + request.META['HTTP_HOST'] + item.doc_file.url,
+                'status':'done',
+                'uid': item.id,
+                'linkProps': '{"download": "file"}'
             })
 
         return JsonResponse({

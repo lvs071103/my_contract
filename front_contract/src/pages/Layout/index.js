@@ -22,15 +22,13 @@ const GeekLayout = () => {
   // const [collapsed, setCollapsed] = useState(false)
   // pathname：url中的子路径
 
-  const { userStore, loginStore, permsStore, groupStore, typesStore, suppliersStore } = useStore()
+  const { userStore, loginStore, permsStore, groupStore } = useStore()
   // 获取用户数据
   useEffect(() => {
     try {
       userStore.getUserInfo()
       permsStore.loadPermslList()
       groupStore.loadGroupList()
-      typesStore.loadTypeList()
-      suppliersStore.loadSupplierList()
     } catch { }
     // 刷新页面获取子菜单
     const getSubKeys = () => {
@@ -50,7 +48,7 @@ const GeekLayout = () => {
     }
     getSubKeys()
   }, // eslint-disable-next-line
-    [userStore, permsStore, groupStore, typesStore, suppliersStore])
+    [userStore, permsStore, groupStore])
 
   const onOpenChange = (keys) => {
     const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1)
