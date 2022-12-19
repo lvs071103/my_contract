@@ -177,16 +177,20 @@ class ContractListView(APIView):
         start_datetime = request.GET.get('start_datetime', None)
         end_datetime = request.GET.get('end_datetime', None)
         type_id = request.GET.get('type_id', None)
-
-        if status and start_datetime and end_datetime and type_id:
+        if status == '0':
+            status = False
+        else:
+            status = True
+        if start_datetime and end_datetime and type_id:
             TIME_ZONE
             new_start = make_aware(transfer(start_datetime))
             new_end = make_aware(transfer(end_datetime))
             queryset = self.model.objects.filter(
-                Q(start_datetime__gt=new_start) and Q(end_datetime__lt=new_end)
-                and Q(status=status) and Q(types=type_id)).order_by('id')
+                status=status, 
+                types=type_id, 
+                start_datetime__gte=new_start, 
+                end_datetime__lte=new_end).order_by('id')
             queryset_serializers = self.serializer_class(queryset, many=True)
-
         elif page_size is None:
             queryset_serializers = self.serializer_class(queryset, many=True)
         else:
@@ -197,9 +201,7 @@ class ContractListView(APIView):
                 page_obj = paginator.page(1)
             except EmptyPage:
                 page_obj = paginator.page(paginator.num_pages)
-
             queryset_serializers = self.serializer_class(page_obj, many=True)
-
         return JsonResponse({
             "data": queryset_serializers.data,
             "count": len(queryset),

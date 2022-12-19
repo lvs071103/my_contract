@@ -6,12 +6,15 @@ import './index.scss'
 import { http } from '@/utils'
 import { EditOutlined, DeleteOutlined, UnorderedListOutlined } from '@ant-design/icons'
 import SupplierForm from './supplier.Form'
+import { useStore } from '@/store'
 
 
 
 const { Search } = Input
 
 export default function Supplier () {
+
+  const { suppliersStore } = useStore()
 
   // 用户列表管理 统一管理数据 将来修入给setList传对象
   const [suppliers, setSuppliers] = useState({
@@ -45,8 +48,12 @@ export default function Supplier () {
         count: count,
       })
     }
+    try {
+      suppliersStore.loadSupplierList()
+    } catch { }
     loadList()
-  }, [params])
+  }, // eslint-disable-next-line
+    [params])
 
 
   // 弹出添加窗口

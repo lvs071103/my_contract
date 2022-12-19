@@ -23,7 +23,7 @@ import moment from "moment"
 import { useState } from 'react'
 // import { observer } from 'mobx-react-lite'
 import { flushSync } from 'react-dom'
-import { typeList } from 'antd/lib/message'
+import { useStore } from '@/store'
 
 
 const { TextArea } = Input
@@ -32,25 +32,11 @@ const { Dragger } = Upload
 
 export default function Publish () {
 
-  // 定义合作伙伴和文本类型
-  const [suppliers, setSuppliers] = useState([])
-  const [types, setTypes] = useState([])
+  const [params] = useSearchParams()
+  const contractId = params.get('contractId')
 
   // 获取合作伙伴和文本类型
-  useEffect(() => {
-    const loadSupplierList = async () => {
-      const res = await http.get('/contract/supplier/list')
-      const supplierList = res.data.data
-      setSuppliers(supplierList)
-    }
-    const loadTypeList = async () => {
-      const res = await http.get('/contract/contract/getTypes')
-      typeList = res.data.types
-      setTypes(typeList)
-    }
-    loadSupplierList()
-    loadTypeList()
-  }, [])
+  const { suppliersStore, typesStore } = useStore()
 
   // 定义上传文件列表
   const [fileList, setFileList] = useState([])
@@ -142,13 +128,11 @@ export default function Publish () {
   }
 
   // 编辑并回填数据
-  const [params] = useSearchParams()
-  const contractId = params.get('contractId')
   const formRef = React.createRef()
   useEffect(() => {
     const loadDetail = async () => {
       const res = await http.get(`contract/contract/detail/${contractId}`)
-      const { fileList, data } = (res.data)
+      const { fileList, data } = res.data
       formRef.current.setFieldsValue({
         name: data.name,
         owner: data.owner,
@@ -165,6 +149,10 @@ export default function Publish () {
     if (contractId) {
       loadDetail()
     }
+    try {
+      suppliersStore.loadSupplierList()
+      typesStore.loadTypeList()
+    } catch { }
   }, // eslint-disable-next-line
     [contractId])
 
@@ -205,7 +193,7 @@ export default function Publish () {
             rules={[{ required: true, message: '请选择文本类型' }]}
           >
             <Select placeholder="请选择文本类型" style={{ width: 400 }}>
-              {types.map(item => (
+              {typesStore.typeList.map(item => (
                 <Option value={item.id} key={item.id}>{item.name}</Option>
               ))}
 
@@ -218,7 +206,7 @@ export default function Publish () {
             rules={[{ required: true, message: '请选择供合作伙伴' }]}
           >
             <Select placeholder="请选择合作伙伴" style={{ width: 400 }}>
-              {suppliers.map(item => (
+              {suppliersStore.supplierList.map(item => (
                 <Option value={item.id} key={item.id}>{item.name}</Option>
               ))}
             </Select>

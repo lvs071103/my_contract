@@ -19,15 +19,17 @@ import 'moment/locale/zh-cn'
 import locale from 'antd/es/date-picker/locale/zh_CN'
 import { Link, useNavigate } from 'react-router-dom'
 import Detail from './detail'
-import { typeList } from 'antd/lib/message'
+import { useStore } from '@/store'
+import { observer } from 'mobx-react-lite'
 
 
 const { Option } = Select
 const { RangePicker } = DatePicker
 
-export default function Contract () {
+function Contract () {
 
-  const [types, setTypes] = useState([])
+  const { typesStore } = useStore()
+  const [value, setValue] = useState(0)
   const [contracts, setContracts] = useState({
     list: [], //合同列表
     count: 0 // 合同数量
@@ -54,23 +56,19 @@ export default function Contract () {
         count: count,
       })
     }
-    const loadTypeList = async () => {
-      const res = await http.get('/contract/contract/getTypes')
-      typeList = res.data.types
-      setTypes(typeList)
-    }
-    loadTypeList()
+    try {
+      typesStore.loadTypeList()
+    } catch { }
+
     loadList()
-  }, [params])
+  }, // eslint-disable-next-line
+    [params])
 
   const onFinish = (values) => {
-    // console.log(values)
     const { type_id, date, status } = values
     //数据处理
     const _params = {}
-    if (status !== -1) {
-      _params.status = status
-    }
+    _params.status = status
     if (type_id) {
       _params.type_id = type_id
     }
@@ -124,6 +122,10 @@ export default function Contract () {
     setRow(data)
   }
 
+  const radioOnChange = (e) => {
+    setValue(e.target.value)
+  }
+
   const columns = [
     {
       title: '合同名',
@@ -159,6 +161,10 @@ export default function Contract () {
           <Tag color="blue">已完成</Tag> :
           <Tag color="green">履约中...</Tag>
       }
+    },
+    {
+      title: '合同价格',
+      dataIndex: 'price'
     },
     {
       title: '用途',
@@ -219,10 +225,9 @@ export default function Contract () {
       >
         <Form
           onFinish={onFinish}
-          initialValues={{ status: -1 }}>
+          initialValues={{ status: value }}>
           <Form.Item label="状态" name="status">
-            <Radio.Group>
-              <Radio value={-1}>全部</Radio>
+            <Radio.Group onChange={radioOnChange}>
               <Radio value={0}>履约中</Radio>
               <Radio value={1}>已完成</Radio>
             </Radio.Group>
@@ -234,7 +239,7 @@ export default function Contract () {
               // defaultValue="lucy"
               style={{ width: 120 }}
             >
-              {types.map(type => (
+              {typesStore.typeList.map(type => (
                 <Option value={type.id} key={type.id}>{type.name}</Option>
               ))}
             </Select>
@@ -279,3 +284,6 @@ export default function Contract () {
     </div>
   )
 }
+
+// export default observer(Contract)
+export default Contract
