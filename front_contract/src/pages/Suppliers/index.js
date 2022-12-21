@@ -14,7 +14,7 @@ const { Search } = Input
 
 export default function Supplier () {
 
-  const { suppliersStore } = useStore()
+  const { suppliersStore, typesStore } = useStore()
 
   // 用户列表管理 统一管理数据 将来修入给setList传对象
   const [suppliers, setSuppliers] = useState({
@@ -48,9 +48,6 @@ export default function Supplier () {
         count: count,
       })
     }
-    try {
-      suppliersStore.loadSupplierList()
-    } catch { }
     loadList()
   }, // eslint-disable-next-line
     [params])
@@ -107,6 +104,10 @@ export default function Supplier () {
         count: count
       }
     )
+    try {
+      suppliersStore.loadSupplierList()
+      typesStore.loadTypeList()
+    } catch { }
   }
 
   const handleCancel = () => {

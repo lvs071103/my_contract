@@ -15,7 +15,7 @@ Including another URLconf
 """
 # from os import access
 # from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from my_contract import settings
 from django.conf.urls.static import static
@@ -26,7 +26,7 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(),
          name='token_obtain_pair'),
     path('api/refresh', TokenRefreshView.as_view(), name='token_refresh'),
-    path('', include('hello.urls')),
+    path('api/statistic/', include('statistic.urls')),
     path('api/contract/', include('contract.urls')),
 ]
 

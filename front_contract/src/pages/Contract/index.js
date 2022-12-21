@@ -20,7 +20,7 @@ import locale from 'antd/es/date-picker/locale/zh_CN'
 import { Link, useNavigate } from 'react-router-dom'
 import Detail from './detail'
 import { useStore } from '@/store'
-import { observer } from 'mobx-react-lite'
+// import { observer } from 'mobx-react-lite'
 
 
 const { Option } = Select

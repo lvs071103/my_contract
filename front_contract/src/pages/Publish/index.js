@@ -92,7 +92,6 @@ export default function Publish () {
 
   // 提交表单
   const onFinish = async (values) => {
-    console.log(values)
     const {
       name,
       types,
@@ -150,8 +149,8 @@ export default function Publish () {
       loadDetail()
     }
     try {
-      suppliersStore.loadSupplierList()
       typesStore.loadTypeList()
+      suppliersStore.loadSupplierList()
     } catch { }
   }, // eslint-disable-next-line
     [contractId])
