@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User, Group
 from contract.models import Contract, Supplier
 import datetime
+from tools.price_sum import statistic_sum, format_data
 
 
 class SumStatisticView(APIView):
@@ -30,33 +31,18 @@ class ContractStatisticView(APIView):
 
     @staticmethod
     def get(request):
-        data = []
         current_year = datetime.datetime.now().strftime("%Y")
         contract = Contract.objects.filter(types='1', start_datetime__contains=current_year)
         order = Contract.objects.filter(types='2', start_datetime__contains=current_year)
         contract_list = []
         order_list = []
         for item in contract:
-            contract_list.append(item.start_datetime.strftime("%Y-%m"))
+            contract_list.append({item.start_datetime.strftime("%Y-%m"): item.price})
         for item in order:
-            order_list.append(item.start_datetime.strftime("%Y-%m"))
+            order_list.append({item.start_datetime.strftime("%Y-%m"): item.price})
 
-        for m in range(1, 13):
-            if m < 10:
-                m = '0{}'.format(m)
-            data.append({
-                '数量': contract_list.count('{}-{}'.format(current_year, m)),
-                'name': '合同',
-                '月份': str(m)
-            })
-
-        for m in range(1, 13):
-            if m < 10:
-                m = '0{}'.format(m)
-            data.append({
-                '数量': order_list.count('{}-{}'.format(current_year, m)),
-                'name': '订单',
-                '月份': str(m),
-            })
+        c_list = format_data(statistic_sum(contract_list), '合同')
+        o_list = format_data(statistic_sum(order_list), '订单')
+        data = c_list + o_list
 
         return Response({"success": True, "message": 'OK', 'data': data})

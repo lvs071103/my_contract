@@ -15,7 +15,7 @@ from tools.remove_file import remove
 from my_contract.settings import MEDIA_ROOT
 from django.utils.timezone import make_aware
 from my_contract.settings import TIME_ZONE
-from django.db.models import Q
+# from django.db.models import Q
 from tools.transfer_string_date import transfer
 
 
@@ -224,13 +224,17 @@ class ContractCreateView(APIView):
         data = {}
         body = json.loads(request.body.decode('utf-8'))
         body['create_datetime'] = datetime.datetime.now()
-        file_list = body['dragger']
+        if 'dragger' in body.keys():
+            file_list = body['dragger']
+        else:
+            file_list = []
         form = self.form_class(body)
         if form.is_valid():
             obj = form.save()
-            for f in file_list:
-                Attachment.objects.filter(pk=f['response']['pk']).update(
-                    contracts_id=obj.pk)
+            if file_list:
+                for f in file_list:
+                    Attachment.objects.filter(pk=f['response']['pk']).update(
+                        contracts_id=obj.pk)
             data['success'] = True
             data['message'] = 'saved'
         else:

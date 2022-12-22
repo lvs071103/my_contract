@@ -19,7 +19,7 @@ const DemoColumn = () => {
     data,
     isGroup: true,
     xField: '月份',
-    yField: '数量',
+    yField: '价格',
     seriesField: 'name',
 
     /** 设置颜色 */
