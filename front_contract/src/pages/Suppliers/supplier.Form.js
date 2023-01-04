@@ -21,6 +21,7 @@ export default function SupplierForm (props) {
       name: values.name,
       manager: values.manager,
       tel: values.tel,
+      email: values.email,
       desc: values.desc
     }
     const response = await http.post(submitURL, { request_params })
@@ -52,6 +53,7 @@ export default function SupplierForm (props) {
         name: suppliers.name,
         manager: suppliers.manager,
         tel: suppliers.tel,
+        email: suppliers.email,
         desc: suppliers.desc,
       })
     }
@@ -118,6 +120,24 @@ export default function SupplierForm (props) {
       <Form.Item
         name="tel"
         label="手机"
+        rules={[
+          {
+            required: true,
+          },
+        ]}
+      >
+        <Input />
+      </Form.Item>
+
+
+      <Form.Item
+        name="email"
+        label="邮箱"
+        rules={[
+          {
+            required: true,
+          },
+        ]}
       >
         <Input />
       </Form.Item>

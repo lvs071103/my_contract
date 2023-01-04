@@ -47,7 +47,7 @@ export default function Publish () {
     label: '附件',
     name: 'doc_file',
     multiple: true,
-    action: 'http://localhost:8000/api/contract/attachments/upload',
+    action: 'http://10.1.32.152:8000/api/contract/attachments/upload',
     headers: { Authorization: `Bearer ${getToken()}` },
     onChange (info) {
       const { status } = info.file
@@ -93,24 +93,26 @@ export default function Publish () {
   // 提交表单
   const onFinish = async (values) => {
     const {
+      contract_sn,
       name,
       types,
       suppliers,
       owner,
       price,
       dragger,
-      start_datetime,
-      end_datetime,
+      start_date,
+      end_date,
       purpose,
       status } = values
     const params = {
+      contract_sn,
       name,
       types,
       suppliers,
       owner,
       price,
-      start_datetime: start_datetime.format('YYYY-MM-DD HH:mm:ss'),
-      end_datetime: end_datetime.format('YYYY-MM-DD HH:mm:ss'),
+      start_date: start_date.format('YYYY-MM-DD'),
+      end_date: end_date.format('YYYY-MM-DD'),
       dragger,
       purpose,
       status
@@ -133,13 +135,14 @@ export default function Publish () {
       const res = await http.get(`contract/contract/detail/${contractId}`)
       const { fileList, data } = res.data
       formRef.current.setFieldsValue({
+        contract_sn: data.contract_sn,
         name: data.name,
         owner: data.owner,
         price: data.price,
         types: data.types,
         suppliers: data.suppliers.id,
-        start_datetime: moment(data.start_datetime),
-        end_datetime: moment(data.end_datetime),
+        start_date: moment(data.start_date),
+        end_date: moment(data.end_date),
         status: data.status ? 1 : 0,
         purpose: data.purpose,
         dragger: fileList,
@@ -179,6 +182,13 @@ export default function Publish () {
             'status': value,
           }}
         >
+          <Form.Item
+            label="合同编号"
+            name="contract_sn"
+            rules={[{ required: true, message: '合同编号' }]}
+          >
+            <Input placeholder="请输入合同编号" style={{ width: 400 }} />
+          </Form.Item>
           <Form.Item
             label="合同名称"
             name="name"
@@ -243,23 +253,23 @@ export default function Publish () {
           </Form.Item>
 
           <Form.Item
-            name="start_datetime"
+            name="start_date"
             label="合同开始时间"
           >
             <DatePicker
-              showTime
-              format="YYYY-MM-DD HH:mm:ss"
+              // showTime
+              format="YYYY-MM-DD"
               locale={locale}
             />
           </Form.Item>
 
           <Form.Item
-            name="end_datetime"
+            name="end_date"
             label="合同终止时间"
           >
             <DatePicker
-              showTime
-              format="YYYY-MM-DD HH:mm:ss"
+              // showTime
+              format="YYYY-MM-DD"
               locale={locale}
             />
           </Form.Item>

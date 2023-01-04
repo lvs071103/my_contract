@@ -143,11 +143,11 @@ function Contract () {
     },
     {
       title: '合同签定时间',
-      dataIndex: 'start_datetime'
+      dataIndex: 'start_date'
     },
     {
       title: '合同截止时间',
-      dataIndex: 'end_datetime'
+      dataIndex: 'end_date'
     },
     {
       title: '负责人',

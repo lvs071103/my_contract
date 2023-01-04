@@ -63,10 +63,10 @@ const Detail = (props) => {
           {moment(contracts.create_datetime).format("YYYY-MM-DD HH:mm:ss")}
         </Descriptions.Item>
         <Descriptions.Item label="合同开始时间">
-          {moment(contracts.start_datetime).format("YYYY-MM-DD HH:mm:ss")}
+          {moment(contracts.start_date).format("YYYY-MM-DD")}
         </Descriptions.Item>
         <Descriptions.Item label="合同截止时间">
-          {moment(contracts.end_datetime).format("YYYY-MM-DD HH:mm:ss")}
+          {moment(contracts.end_date).format("YYYY-MM-DD")}
         </Descriptions.Item>
         <Descriptions.Item label="状态">
           {contracts.status ?

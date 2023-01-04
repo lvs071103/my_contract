@@ -13,7 +13,7 @@ class LoginStore {
     // console.log(username, password)
     // 调用登陆接口
     // 存入token
-    const response = await http.post('http://localhost:8000/api/token/', {
+    const response = await http.post('http://10.1.32.152:8000/api/token/', {
       "username": username, "password": password
     })
     // 存入token

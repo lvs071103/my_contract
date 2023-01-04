@@ -17,10 +17,12 @@ from django.utils.timezone import make_aware
 from my_contract.settings import TIME_ZONE
 # from django.db.models import Q
 from tools.transfer_string_date import transfer
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
-class SupplierListView(APIView):
+class SupplierListView(APIView, PermissionRequiredMixin):
     permission_classes = (IsAuthenticated, )
+    permission_required = 'contract.view_contract'
     model = Supplier
     serializer_class = SupplierSerializer
 
