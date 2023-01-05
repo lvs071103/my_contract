@@ -12,16 +12,22 @@ class Supplier(models.Model):
                            null=True)
     email = models.EmailField(verbose_name='邮件', max_length=20, blank=True, null=True)
     desc = models.TextField(verbose_name='描述', blank=True, null=True)
+    
+    
+class Category(models.Model):
+    name = models.CharField(verbose_name='名称', max_length=50)
+    desc = models.TextField(verbose_name='备注', null=True, blank=True)
 
 
 class Contract(models.Model):
-    TYPE_CHOICE = (
-        ('1', '合同'),
-        ('2', '订单'),
-    )
+    # TYPE_CHOICE = (
+    #     ('1', '合同'),
+    #     ('2', '订单'),
+    # )
     contract_sn = models.CharField(verbose_name='合同编号', max_length=15, null=True)
     name = models.CharField(verbose_name='名称', unique=True, max_length=50)
-    types = models.CharField(max_length=1, choices=TYPE_CHOICE, default='1')
+    # types = models.CharField(max_length=1, choices=TYPE_CHOICE, default='1')
+    categories = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
     price = models.IntegerField(verbose_name='价格', default=0)
     create_datetime = models.DateTimeField(verbose_name='创建时间',
                                            blank=True,

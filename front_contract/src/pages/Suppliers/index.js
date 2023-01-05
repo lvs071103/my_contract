@@ -142,6 +142,10 @@ export default function Supplier () {
       dataIndex: 'tel'
     },
     {
+      title: '邮箱',
+      dataIndex: 'email'
+    },
+    {
       title: '描述',
       dataIndex: 'desc'
     },

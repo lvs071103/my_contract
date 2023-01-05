@@ -2,6 +2,9 @@ from django.urls import path, re_path
 from contract import views
 
 urlpatterns = [
+    path('category/list/', 
+         views.CategoryListView.as_view(), 
+         name='category_list'),
     path('supplier/list/',
          views.SupplierListView.as_view(),
          name='supplier_list'),

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from contract.models import Supplier, Contract, Attachment
+from contract.models import Supplier, Contract, Attachment, Category
 
 
 class SupplierSerializer(serializers.ModelSerializer):
@@ -9,8 +9,15 @@ class SupplierSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CategrySerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Category
+        fields = '__all__'
+
 class ContractSerializer(serializers.ModelSerializer):
     suppliers = SupplierSerializer(read_only=True)
+    categories = CategrySerializer(read_only=True)
 
     class Meta:
         model = Contract

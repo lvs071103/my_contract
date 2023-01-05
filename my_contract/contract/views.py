@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from contract.serializers import SupplierSerializer, ContractSerializer, AttachmentSerializer
+from contract.serializers import SupplierSerializer, ContractSerializer, AttachmentSerializer, CategrySerializer
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from contract.models import Supplier, Contract, Attachment
+from contract.models import Supplier, Contract, Attachment, Category
 from contract.forms import SupplierForm, AttachmentForm, ContractForm
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
@@ -440,3 +440,34 @@ class AttachmentDeleteView(APIView):
         except self.model.DoesNotExist:
             raise Http404
         return JsonResponse({'success': True, 'message': 'deleted!'})
+
+
+class CategoryListView(APIView):
+    permission_classes = (IsAuthenticated, )
+    category_serializers = CategrySerializer
+    model = Category
+
+    def get(self, request):
+        queryset = self.model.objects.get_queryset().order_by('id')
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('pageSize', None)
+
+        if page_size is None:
+            queryset_serializers = self.serializer_class(queryset, many=True)
+        else:
+            paginator = Paginator(queryset, page_size)
+
+            try:
+                page_obj = paginator.get_page(page)
+            except PageNotAnInteger:
+                page_obj = paginator.page(1)
+            except EmptyPage:
+                page_obj = paginator.page(paginator.num_pages)
+
+            queryset_serializers = self.serializer_class(page_obj, many=True)
+
+        return JsonResponse({
+            "data": queryset_serializers.data,
+            "count": len(queryset),
+            'success': True
+        })
