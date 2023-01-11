@@ -68,6 +68,7 @@ const GeekLayout = () => {
       ]),
     getItem('合同管理', 'sub2', <EditOutlined />,
       [
+        getItem(<Link to={'/contract/category/list'}>合同分类</Link>, '/contract/category/list'),
         getItem(<Link to={'/contract/supplier/list'}>合作伙伴</Link>, '/contract/supplier/list'),
         getItem(<Link to={'/contract/contract/list'}>合同列表</Link>, '/contract/contract/list'),
         getItem(<Link to={'/contract/contract/publish'}>提交表单</Link>, '/contract/contract/publish'),

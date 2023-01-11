@@ -6,24 +6,22 @@ import { useEffect } from 'react'
 
 const { TextArea } = Input
 
-export default function SupplierForm (props) {
-
+export default function CategoryForm (props) {
   const formRef = React.createRef()
-
   const { id, title, handleOk } = props
 
-  const submitURL = id ? `/contract/supplier/edit/${id}` : '/contract/supplier/add'
+  console.log(id)
+
+  const submitURL = id ? `/contract/category/edit/${id}` : '/contract/category/add'
 
   const onFinish = async (values) => {
     // 提交数据
     // console.log(values)
     const request_params = {
       name: values.name,
-      manager: values.manager,
-      tel: values.tel,
-      email: values.email,
       desc: values.desc
     }
+
     const response = await http.post(submitURL, { request_params })
     if (response.data.success === true) {
       Swal.fire({
@@ -43,18 +41,19 @@ export default function SupplierForm (props) {
     }
   }
 
+  const onReset = () => {
+    formRef.current.resetFields()
+  }
+
   // 编辑
   // 数据回填, id调用接口，1.表单回填 2.暂存列表
   useEffect(() => {
     const loadDetail = async () => {
-      const res = await http.get(`contract/supplier/detail/${id}`)
-      const suppliers = res.data.supplier_obj
+      const res = await http.get(`contract/category/detail/${id}`)
+      const categories = res.data.supplier_obj
       formRef.current.setFieldsValue({
-        name: suppliers.name,
-        manager: suppliers.manager,
-        tel: suppliers.tel,
-        email: suppliers.email,
-        desc: suppliers.desc,
+        name: categories.name,
+        desc: categories.desc,
       })
     }
     if (id) {
@@ -67,9 +66,6 @@ export default function SupplierForm (props) {
     // eslint-disable-next-line 
     [id])
 
-  const onReset = () => {
-    formRef.current.resetFields()
-  }
 
   const layout = {
     labelCol: {
@@ -97,43 +93,7 @@ export default function SupplierForm (props) {
     >
       <Form.Item
         name="name"
-        label="供应商"
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item
-        name="manager"
-        label="联系人"
-        rules={[
-          {
-            required: true
-          }
-        ]}
-      >
-        <Input />
-      </Form.Item>
-
-      <Form.Item
-        name="tel"
-        label="手机"
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-
-
-      <Form.Item
-        name="email"
-        label="邮箱"
+        label="分类"
         rules={[
           {
             required: true,

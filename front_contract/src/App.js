@@ -13,6 +13,7 @@ const Group = lazy(() => import('@/pages/Group'))
 const Contract = lazy(() => import('@/pages/Contract'))
 const Supplier = lazy(() => import('@/pages/Suppliers'))
 const Publish = lazy(() => import('@/pages/Publish'))
+const Category = lazy(() => import('@/pages/Category'))
 
 export default class App extends Component {
   render () {
@@ -46,6 +47,7 @@ export default class App extends Component {
               <Route path='/contract/contract/list' element={<Contract />}></Route>
               <Route path='/contract/supplier/list' element={<Supplier />}></Route>
               <Route path='/contract/contract/publish' element={<Publish />}></Route>
+              <Route path='/contract/category/list' element={<Category />}></Route>
             </Route>
             <Route path='/login/' element={<Login />}></Route>
           </Routes>

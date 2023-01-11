@@ -5,7 +5,7 @@ import React from "react"
 import UserStore from "./user.Store"
 import PermsStore from "./perms.Store"
 import GroupStore from "./group.Store"
-import TypesStore from './types.Store'
+import CategoryStore from './categories.Store'
 import SuppliersStore from "./suppliers.Store"
 
 class RootStore {
@@ -14,7 +14,7 @@ class RootStore {
     this.userStore = new UserStore()
     this.groupStore = new GroupStore()
     this.permsStore = new PermsStore()
-    this.typesStore = new TypesStore()
+    this.categoryStore = new CategoryStore()
     this.suppliersStore = new SuppliersStore()
   }
 }

@@ -36,7 +36,7 @@ export default function Publish () {
   const contractId = params.get('contractId')
 
   // 获取合作伙伴和文本类型
-  const { suppliersStore, typesStore } = useStore()
+  const { suppliersStore, categoryStore } = useStore()
 
   // 定义上传文件列表
   const [fileList, setFileList] = useState([])
@@ -152,7 +152,7 @@ export default function Publish () {
       loadDetail()
     }
     try {
-      typesStore.loadTypeList()
+      categoryStore.loadCategoryList()
       suppliersStore.loadSupplierList()
     } catch { }
   }, // eslint-disable-next-line
@@ -202,7 +202,7 @@ export default function Publish () {
             rules={[{ required: true, message: '请选择文本类型' }]}
           >
             <Select placeholder="请选择文本类型" style={{ width: 400 }}>
-              {typesStore.typeList.map(item => (
+              {categoryStore.categoryList.map(item => (
                 <Option value={item.id} key={item.id}>{item.name}</Option>
               ))}
 

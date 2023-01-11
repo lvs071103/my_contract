@@ -28,7 +28,7 @@ const { RangePicker } = DatePicker
 
 function Contract () {
 
-  const { typesStore } = useStore()
+  const { categoryStore } = useStore()
   const [value, setValue] = useState(0)
   const [contracts, setContracts] = useState({
     list: [], //合同列表
@@ -56,10 +56,6 @@ function Contract () {
         count: count,
       })
     }
-    try {
-      typesStore.loadTypeList()
-    } catch { }
-
     loadList()
   }, // eslint-disable-next-line
     [params])
@@ -233,14 +229,14 @@ function Contract () {
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item label="分类" name="type_id">
+          <Form.Item label="合同分类" name="type_id">
             <Select
-              placeholder="请选择类型"
+              placeholder="请选择合同分类"
               // defaultValue="lucy"
               style={{ width: 120 }}
             >
-              {typesStore.typeList.map(type => (
-                <Option value={type.id} key={type.id}>{type.name}</Option>
+              {categoryStore.categoryList.map(item => (
+                <Option value={item.id} key={item.id}>{item.name}</Option>
               ))}
             </Select>
           </Form.Item>
