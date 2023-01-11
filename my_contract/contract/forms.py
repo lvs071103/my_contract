@@ -1,5 +1,5 @@
 from django import forms
-from contract.models import Supplier, Attachment, Contract
+from contract.models import Supplier, Attachment, Contract, Category
 
 
 class SupplierForm(forms.ModelForm):
@@ -20,4 +20,11 @@ class ContractForm(forms.ModelForm):
 
     class Meta:
         model = Contract
+        fields = '__all__'
+        
+
+class CategoryForm(forms.ModelForm):
+    
+    class Meta:
+        model = Category
         fields = '__all__'

@@ -2,9 +2,21 @@ from django.urls import path, re_path
 from contract import views
 
 urlpatterns = [
-    path('category/list/', 
+    path('category/list', 
          views.CategoryListView.as_view(), 
          name='category_list'),
+    path('category/add', 
+         views.CategoryCreateView.as_view(), 
+         name='category_add'),
+    re_path(r'category/edit/(?P<pk>\d+)$', 
+            views.CategoryUpdateView.as_view(), 
+            name='category_update'),
+    re_path(r'category/detail/(?P<pk>\d+)$', 
+            views.CategoryDetailView.as_view(), 
+            name='category_detail'),
+    re_path(r'category/delete/(?P<pk>\d+)$', 
+            views.CategoryDeleteView.as_view(), 
+            name='category_delete'),
     path('supplier/list/',
          views.SupplierListView.as_view(),
          name='supplier_list'),

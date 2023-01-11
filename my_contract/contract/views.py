@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from contract.serializers import SupplierSerializer, ContractSerializer, AttachmentSerializer, CategrySerializer
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from contract.models import Supplier, Contract, Attachment, Category
-from contract.forms import SupplierForm, AttachmentForm, ContractForm
+from contract.forms import SupplierForm, AttachmentForm, ContractForm, CategoryForm
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 # from django.core import serializers
@@ -444,7 +444,7 @@ class AttachmentDeleteView(APIView):
 
 class CategoryListView(APIView):
     permission_classes = (IsAuthenticated, )
-    category_serializers = CategrySerializer
+    serializer_class = CategrySerializer
     model = Category
 
     def get(self, request):
@@ -471,3 +471,116 @@ class CategoryListView(APIView):
             "count": len(queryset),
             'success': True
         })
+        
+
+class CategoryCreateView(APIView):
+    permission_classes = (IsAuthenticated, )
+    model = Category
+    form_class = CategoryForm
+
+    @staticmethod
+    def get(request):
+        return JsonResponse({
+            "message":
+            "this is only {} request".format(str(request.method).lower()),
+        })
+
+    def post(self, request):
+        data = {}
+        body = json.loads(request.body.decode('utf-8'))['request_params']
+        form = self.form_class(body)
+        if form.is_valid():
+            form.save()
+            data['success'] = True
+            data['message'] = 'saved'
+        else:
+            for field, errors in form.errors.items():
+                error = 'Field: {} Errors: {}'.format(field, ','.join(errors))
+                data = {'success': False, 'message': error}
+
+        return JsonResponse(data)
+
+
+class CategoryUpdateView(APIView):
+    model = Category
+    form_class = CategoryForm
+    permission_classes = (IsAuthenticated, )
+
+    @staticmethod
+    def get(request):
+        return JsonResponse({
+            "message":
+            "this is only {} request".format(str(request.method).lower()),
+        })
+
+    def post(self, request, pk):
+        data = {}
+        supplier_obj = self.model.objects.get(pk=pk)
+        body = json.loads(request.body.decode('utf-8'))['request_params']
+        form = self.form_class(data=body, instance=supplier_obj)
+        if form.is_valid():
+            form.save()
+            data['success'] = True
+            data['message'] = 'update!'
+        else:
+            for field, errors in form.errors.items():
+                error = 'Field: {} Errors: {}'.format(field, ','.join(errors))
+                data = {'success': False, 'message': error}
+
+        return JsonResponse(data)
+    
+
+class CategoryDetailView(APIView):
+    permission_classes = (IsAuthenticated, )
+    serializers_class = CategrySerializer
+    model = Category
+
+    def get(self, request, pk):
+        try:
+            categories = self.model.objects.get(pk=pk)
+        except self.model.DoesNotExist:
+            raise Http404
+
+        supplier_serializers = self.serializers_class(categories)
+
+        return JsonResponse({
+            "supplier_obj": supplier_serializers.data,
+            'success': True,
+        })
+
+        
+class CategoryDeleteView(APIView):
+    model = Category
+    permission_classes = (IsAuthenticated, )
+    http_method_names = ['get', 'post', 'delete']
+
+    def dispatch(self, *args, **kwargs):
+        method = self.request.POST.get('_method', '').lower()
+        if method == 'get':
+            return self.get(*args, **kwargs)
+        if method == 'delete':
+            return self.delete(*args, **kwargs)
+        if method == 'post':
+            return self.post(*args, **kwargs)
+        return super(CategoryDeleteView, self).dispatch(*args, **kwargs)
+
+    @staticmethod
+    def get(request):
+        return JsonResponse({
+            "message":
+            "this is only {} request".format(str(request.method).lower()),
+        })
+
+    def delete(self, *args, **kwargs):
+        try:
+            get_object_or_404(self.model, pk=kwargs['pk']).delete()
+        except self.model.DoesNotExist:
+            raise Http404
+        return JsonResponse({'success': True, 'message': 'deleted!'})
+
+    def post(self, *args, **kwargs):
+        try:
+            get_object_or_404(self.model, pk=kwargs['pk']).delete()
+        except self.model.DoesNotExist:
+            raise Http404
+        return JsonResponse({'success': True, 'message': 'deleted!'})
