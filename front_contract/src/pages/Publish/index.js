@@ -95,7 +95,7 @@ export default function Publish () {
     const {
       contract_sn,
       name,
-      types,
+      categories,
       suppliers,
       owner,
       price,
@@ -107,7 +107,7 @@ export default function Publish () {
     const params = {
       contract_sn,
       name,
-      types,
+      categories,
       suppliers,
       owner,
       price,
@@ -139,7 +139,7 @@ export default function Publish () {
         name: data.name,
         owner: data.owner,
         price: data.price,
-        types: data.types,
+        categories: data.categories.id,
         suppliers: data.suppliers.id,
         start_date: moment(data.start_date),
         end_date: moment(data.end_date),
@@ -151,10 +151,6 @@ export default function Publish () {
     if (contractId) {
       loadDetail()
     }
-    try {
-      categoryStore.loadCategoryList()
-      suppliersStore.loadSupplierList()
-    } catch { }
   }, // eslint-disable-next-line
     [contractId])
 
@@ -198,7 +194,7 @@ export default function Publish () {
           </Form.Item>
           <Form.Item
             label="文本类型"
-            name="types"
+            name="categories"
             rules={[{ required: true, message: '请选择文本类型' }]}
           >
             <Select placeholder="请选择文本类型" style={{ width: 400 }}>
@@ -226,7 +222,11 @@ export default function Publish () {
             name="price"
             rules={[{ required: true, message: '请输入该合同的价格' }]}
           >
-            <Input type='number' placeholder="请输入该合同的价格" style={{ width: 400 }} />
+            <Input type='number'
+              placeholder="请输入该合同的价格"
+              style={{ width: 400 }}
+              prefix="￥" suffix="RMB"
+              disabled={contractId ? true : false} />
           </Form.Item>
 
           <Form.Item

@@ -8,7 +8,7 @@ import {
   Form,
   Button,
   Radio,
-  DatePicker,
+  // DatePicker,
   Select,
   Popconfirm,
   Drawer
@@ -16,7 +16,7 @@ import {
 import { http } from '@/utils'
 import { EditOutlined, DeleteOutlined, UnorderedListOutlined } from '@ant-design/icons'
 import 'moment/locale/zh-cn'
-import locale from 'antd/es/date-picker/locale/zh_CN'
+// import locale from 'antd/es/date-picker/locale/zh_CN'
 import { Link, useNavigate } from 'react-router-dom'
 import Detail from './detail'
 import { useStore } from '@/store'
@@ -24,11 +24,11 @@ import { useStore } from '@/store'
 
 
 const { Option } = Select
-const { RangePicker } = DatePicker
+// const { RangePicker } = DatePicker
 
 function Contract () {
 
-  const { categoryStore } = useStore()
+  const { categoryStore, suppliersStore } = useStore()
   const [value, setValue] = useState(0)
   const [contracts, setContracts] = useState({
     list: [], //合同列表
@@ -61,16 +61,16 @@ function Contract () {
     [params])
 
   const onFinish = (values) => {
-    const { type_id, date, status } = values
+    console.log(values)
+    const { categories, suppliers, status } = values
     //数据处理
     const _params = {}
     _params.status = status
-    if (type_id) {
-      _params.type_id = type_id
+    if (categories) {
+      _params.categories = categories
     }
-    if (date) {
-      _params.start_datetime = date[0].format('YYYY-MM-DD')
-      _params.end_datetime = date[1].format('YYYY-MM-DD')
+    if (suppliers) {
+      _params.suppliers = suppliers
     }
     // 修改params数据， 引起接口重新发送，对象的合并是一个整体覆盖，改了对像的整体引用
     // setParams(params)
@@ -124,17 +124,19 @@ function Contract () {
 
   const columns = [
     {
+      title: '合同编号',
+      dataIndex: 'contract_sn',
+    },
+    {
       title: '合同名',
       dataIndex: 'name',
       width: 220
     },
     {
       title: '类型',
-      dataIndex: 'types',
+      dataIndex: 'categories',
       render: (text, _) => {
-        return `${text}` === '1' ?
-          <Tag color="green">合同</Tag> :
-          <Tag color="yellow">订单</Tag>
+        return text ? text.name : <Tag color="red">未指定</Tag>
       }
     },
     {
@@ -159,12 +161,16 @@ function Contract () {
       }
     },
     {
-      title: '合同价格',
-      dataIndex: 'price'
+      title: '供应商',
+      dataIndex: 'suppliers',
+      render: (text, _) => {
+        return text ? text.name : <Tag color="red">未指定</Tag>
+      }
     },
     {
       title: '用途',
-      dataIndex: 'purpose'
+      dataIndex: 'purpose',
+      width: 300
     },
     {
       title: '操作',
@@ -229,11 +235,15 @@ function Contract () {
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item label="合同分类" name="type_id">
+          <Form.Item
+            label="合同分类"
+            name="categories"
+          // rules={[{ required: true, message: '选择合同分类' }]}
+          >
             <Select
               placeholder="请选择合同分类"
               // defaultValue="lucy"
-              style={{ width: 120 }}
+              style={{ width: 200 }}
             >
               {categoryStore.categoryList.map(item => (
                 <Option value={item.id} key={item.id}>{item.name}</Option>
@@ -241,9 +251,22 @@ function Contract () {
             </Select>
           </Form.Item>
 
-          <Form.Item label="日期" name="date">
+          <Form.Item
+            label="合作伙伴"
+            name="suppliers"
+          // rules={[{ required: true, message: '选择合作伙伴' }]}
+          >
             {/* 传入locale属性 控制中文显示*/}
-            <RangePicker locale={locale}></RangePicker>
+            {/* <RangePicker locale={locale}></RangePicker> */}
+            <Select
+              placeholder="请选择合作伙伴"
+              // defaultValue="lucy"
+              style={{ width: 300 }}
+            >
+              {suppliersStore.supplierList.map(item => (
+                <Option value={item.id} key={item.id}>{item.name}</Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item>

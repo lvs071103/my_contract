@@ -176,24 +176,26 @@ class ContractListView(APIView):
         page = request.GET.get('page', 1)
         page_size = request.GET.get('pageSize', None)
         status = request.GET.get('status', None)
-        start_datetime = request.GET.get('start_datetime', None)
-        end_datetime = request.GET.get('end_datetime', None)
-        type_id = request.GET.get('type_id', None)
+        suppliers = request.GET.get('suppliers', None)
+        categories = request.GET.get('categories', None)
         if status == '0':
             status = False
         else:
             status = True
-        if start_datetime and end_datetime and type_id:
-            TIME_ZONE
-            new_start = make_aware(transfer(start_datetime))
-            new_end = make_aware(transfer(end_datetime))
-            queryset = self.model.objects.filter(
-                status=status, 
-                types=type_id, 
-                start_datetime__gte=new_start, 
-                end_datetime__lte=new_end).order_by('id')
-            queryset_serializers = self.serializer_class(queryset, many=True)
-        elif page_size is None:
+        if categories:
+            print("categories true")
+            queryset = self.model.objects.filter(status=status,
+                                                 categories=categories).order_by('id')
+        if suppliers:
+            print("suppliers true")
+            queryset = self.model.objects.filter(status=status,
+                                                 suppliers=suppliers).order_by('id')
+        if categories and suppliers:
+            print("categories suppliers both true")
+            queryset = self.model.objects.filter(status=status,
+                                                 suppliers=suppliers, 
+                                                 categories=categories).order_by('id')
+        if page_size is None:
             queryset_serializers = self.serializer_class(queryset, many=True)
         else:
             paginator = Paginator(queryset, page_size)

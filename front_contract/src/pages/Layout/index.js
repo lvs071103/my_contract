@@ -22,13 +22,15 @@ const GeekLayout = () => {
   // const [collapsed, setCollapsed] = useState(false)
   // pathname：url中的子路径
 
-  const { userStore, loginStore, permsStore, groupStore } = useStore()
+  const { userStore, loginStore, permsStore, groupStore, suppliersStore, categoryStore } = useStore()
   // 获取用户数据
   useEffect(() => {
     try {
       userStore.getUserInfo()
       permsStore.loadPermslList()
       groupStore.loadGroupList()
+      suppliersStore.loadSupplierList()
+      categoryStore.loadCategoryList()
     } catch { }
     // 刷新页面获取子菜单
     const getSubKeys = () => {
