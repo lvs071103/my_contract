@@ -226,7 +226,8 @@ export default function Publish () {
               placeholder="请输入该合同的价格"
               style={{ width: 400 }}
               prefix="￥" suffix="RMB"
-              disabled={contractId ? true : false} />
+              disabled={contractId ? true : false}
+            />
           </Form.Item>
 
           <Form.Item
